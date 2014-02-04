@@ -1,4 +1,4 @@
-operating-system
+operating system
 ================
 
-Operating System
+This projects goal is to create a network driver for an emulated operating system
