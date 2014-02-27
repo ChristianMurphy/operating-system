@@ -5,12 +5,12 @@ This project's goal is to create a network driver for an emulated operating syst
 
 
 ## Page Table
-###levels of the page table
+### levels of the page table
 1. table of processes
 2. process table
 3. memory
 
-###page table storage
+### page table storage
 a page is 2^12 bits in size
 
 1. 32bit page entries
@@ -25,3 +25,20 @@ a page is 2^12 bits in size
   * 16 bit address
 * standard page
   * 1 Not Recently Used bit
+
+
+## Program
+### function signature
+``` c
+program(
+ u32 priority,
+ u32 input_output_functions,
+ u32 input_output_function_standard_deviation,
+ u32 size,
+ u32 execution_time,
+ u32 working_set_size,
+ u32 working_set_standard_deviation,
+ u32 working_set_duration,
+ u32 working_set_duration_standard_deviation
+)
+```
