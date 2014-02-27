@@ -37,7 +37,7 @@ program(
  u32 size,
  u32 execution_time,
  u32 working_set_size,
- u32 working_set_standard_deviation,
+ u32 working_set_size_standard_deviation,
  u32 working_set_duration,
  u32 working_set_duration_standard_deviation
 )
