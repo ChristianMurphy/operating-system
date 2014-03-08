@@ -26,6 +26,10 @@ a page is 2^12 bits in size
 * standard page
   * 1 Not Recently Used bit
 
+### page structure 2
+* 10 bits - an address
+* 10 bits - another address
+* 12 bits - and a longer address
 
 ## Program
 ### function signature
@@ -42,6 +46,14 @@ program(
  u32 working_set_duration_standard_deviation
 )
 ```
+
+### what to do when there is a page fault
+1. check what process was using page
+	i. 
+	ii. tell that process that the memory has been freed
+2. check if the page is clean
+	i. if the page is dirty store to disk
+3. write new page into that memory
 
 ## Generic Page Table example implimentation
 [Page Table in C](https://github.com/torvalds/linux/blob/f7556698a36995a755a4ce154953dcf438145b3b/mm/pgtable-generic.c)

@@ -8,3 +8,7 @@ typedef	unsigned	int		u32;
 typedef 			int		s32;
 typedef unsigned	long	u64;
 typedef 			long	s64;
+
+typedef struct {
+	u32 *page[128];
+} page;
