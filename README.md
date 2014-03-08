@@ -1,7 +1,7 @@
 operating system
 ================
 
-This project's goal is to create a network driver for an emulated operating system
+This project's goal is to create an emulated operating system
 
 
 ## Page Table
