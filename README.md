@@ -18,18 +18,14 @@ a page is 2^12 bits in size
 3. 1 bit for the nru, the rest is storage
 
 ###page structure
-* page table entry
-  * 1 bit for page clean or dirty
-  * 1 bit for page is valid
-  * 14 unused bits
-  * 16 bit address
-* standard page
-  * 1 Not Recently Used bit
-
-### page table entry (?)
-* 10 bits - an address
-* 10 bits - another address
-* 12 bits - and a longer address
+* 1 bit for the page use status
+* 1 bit for page clean or dirty
+* 1 bit for page is pinned
+* 13 padding bits
+* 10 bits for level one cache
+* 6 padding bits
+* 10 bits for level two cache
+* 6 padding bits
 
 ## Program
 ### function signature
@@ -54,6 +50,3 @@ program(
 2. check if the page is clean
     i. if the page is dirty store to disk
 3. write new page into that memory
-
-## Generic Page Table example implimentation
-[Page Table in C](https://github.com/torvalds/linux/blob/f7556698a36995a755a4ce154953dcf438145b3b/mm/pgtable-generic.c)
