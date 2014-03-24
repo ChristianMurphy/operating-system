@@ -1,7 +1,7 @@
 operating system
 ================
 
-This project's goal is to create a network driver for an emulated operating system
+This project's goal is to create an emulated operating system
 
 
 ## Page Table
@@ -26,7 +26,7 @@ a page is 2^12 bits in size
 * standard page
   * 1 Not Recently Used bit
 
-### page structure 2
+### page table entry (?)
 * 10 bits - an address
 * 10 bits - another address
 * 12 bits - and a longer address
