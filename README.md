@@ -1,4 +1,4 @@
-operating system
+operating system [![Build Status](https://travis-ci.org/ChristianMurphy/operating-system.svg?branch=master)](https://travis-ci.org/ChristianMurphy/operating-system)
 ================
 
 This project's goal is to create an emulated operating system
@@ -49,10 +49,10 @@ program(
 
 ### what to do when there is a page fault
 1. check what process was using page
-	i. 
-	ii. tell that process that the memory has been freed
+    i.
+    ii. tell that process that the memory has been freed
 2. check if the page is clean
-	i. if the page is dirty store to disk
+    i. if the page is dirty store to disk
 3. write new page into that memory
 
 ## Generic Page Table example implimentation
