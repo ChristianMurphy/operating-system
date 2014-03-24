@@ -1,6 +1,7 @@
 #include <stdio.h>
-#include "types.h"
-#include "memory_manage.h"
+#include "headers/types.h"
+#include "headers/memory_manage.h"
+#include "headers/signatures.h"
 
 /*!
  * memory consists of 2^12 (4,096) bits

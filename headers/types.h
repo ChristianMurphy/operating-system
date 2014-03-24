@@ -32,3 +32,6 @@ typedef
         Timer
     }
 dev_type;
+
+// WARNING! It is currently unknown what a process contains
+typedef int process;
