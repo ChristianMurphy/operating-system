@@ -120,5 +120,5 @@ main ()
         x = lsb8(i);
         printf("lsb8(i) = %02x\n", x);
     }
-
+    return 0;
 }
