@@ -14,4 +14,3 @@ addons:
       name: ChristianMurphy/operating-system
       description: Your project description here
     build_command: cc util.c
-    branch_pattern: *
