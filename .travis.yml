@@ -1,7 +1,17 @@
 language: c
 compiler:
-  - gcc
-  - clang
+- gcc
+- clang
 script:
-  - cc util.c
-  - ./a.out
+- cc util.c
+- "./a.out"
+env:
+  global:
+  - secure: K5AA7FDrOeZZhZlx2fssGfGD3vcIcgA7a5JmQtr/ZcewRPJLTlS0CXMnd2SE8DHpEebuvBbpxLzliHCecJsSsI5eVt5vpy82oSsTEV4caZ+sc1W4+HWlRv3n7mNOIBlbYPvIdGKLjxcd4oyQB3DJZOIoW9V1+Y0Gk2tt8vhf2FE=
+addons:
+  coverity_scan:
+    project:
+      name: ChristianMurphy/operating-system
+      description: Your project description here
+    build_command: cc util.c
+    branch_pattern: *
