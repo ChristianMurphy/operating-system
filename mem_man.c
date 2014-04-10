@@ -11,6 +11,7 @@
 #define VAS_VEC_SIZE_MASK   (VAS_VEC_SIZE - 1)
 
 static  page        mem[PAGE_COUNT];
+// point to next availible page
 static  u16         page_avail              = 0;
 static  mem_manage  mem_man[PAGE_COUNT]     = {0};
 static  u16         mem_offset              = 1;
@@ -28,6 +29,7 @@ read_page (
     for (i = 0; i < 512; ++i) x->_u64[i]        = mem[y]._u64[i];
 }
 
+// may need to set dirty bit
 void
 write_page (
     page*   x,
@@ -42,6 +44,7 @@ u16
 page_alloc(
 )
 {
+    // store current free page to temp, pop next avail page
     u16 t   = page_avail;
     if (page_avail) page_avail  = mem[page_avail]._u16[0];
     return t;
@@ -69,7 +72,8 @@ vas_free (
     u16 v[],
     u32 size
 ) {
-
+static  u16         mem_offset              = 1;
+static  u64         vas_vec[VAS_VEC_SIZE]   =
 }
 
 u16
