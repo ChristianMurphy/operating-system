@@ -72,8 +72,8 @@ vas_free (
     u16 v[],
     u32 size
 ) {
-static  u16         mem_offset              = 1;
-static  u64         vas_vec[VAS_VEC_SIZE]   =
+    static  u16         mem_offset              = 1;
+    static  u64         vas_vec[VAS_VEC_SIZE]   = 0;
 }
 
 u16
