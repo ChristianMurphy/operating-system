@@ -1,4 +1,4 @@
-operating system [![Build Status](https://travis-ci.org/ChristianMurphy/operating-system.svg?branch=master)](https://travis-ci.org/ChristianMurphy/operating-system) [![Coverity Scan Build Status](https://scan.coverity.com/projects/1681/badge.svg)](https://scan.coverity.com/projects/1681)
+operating system [![Build Status](https://travis-ci.org/ChristianMurphy/operating-system.svg?branch=master)](https://travis-ci.org/ChristianMurphy/)
 ================
 
 This project's goal is to create an emulated operating system
