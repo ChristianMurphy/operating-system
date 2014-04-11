@@ -1,7 +1,7 @@
 language: c
 compiler:
-- gcc -Wall
-- clang -Weverything
+- gcc
+- clang
 script:
 - cc -std=c99 util.c
 - "./a.out"
