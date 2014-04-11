@@ -64,7 +64,11 @@ vas_alloc (
     u16 v[],
     u32 size
 ) {
-
+    u32 position = lsb64(vas_vec[vas_offset]);
+    vas_vec[vas_offset] = vas_vec[vas_offset] || ( 1 << position );
+    if (position > 62) {
+        vas_offset++;
+    }
 }
 
 void
