@@ -1,10 +1,7 @@
 language: c
 compiler:
-- gcc
-- clang
-env:
-- std=c99
-- std=c0x
+- gcc -Wall
+- clang -Weverything
 script:
-- cc -std=$std util.c
+- cc -std=c99 util.c
 - "./a.out"
