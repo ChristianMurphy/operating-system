@@ -64,10 +64,16 @@ vas_alloc (
     u16 v[],
     u32 size
 ) {
-    u32 position = lsb64(vas_vec[vas_offset]);
-    vas_vec[vas_offset] = vas_vec[vas_offset] || ( 1 << position );
-    if (position > 62) {
-        vas_offset++;
+    //for all the memory you are asking for
+    for (u32 counter = size; counter > 0; counter--) {
+        //find first open position
+        u32 position = lsb64(vas_vec[vas_offset]);
+        //allocate that position
+        vas_vec[vas_offset] = vas_vec[vas_offset] || ( 1 << position );
+        //if there is no more room in the block move to next block
+        if (position > 62) {
+            vas_offset++;
+        }
     }
 }
 
