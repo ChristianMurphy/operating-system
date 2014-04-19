@@ -5,9 +5,9 @@
 #include    "headers/mem_man.h"
 #include    "headers/proc.h"
 
-static  u64         time            = 0;;
-static  process*    blocked_list    = 0;;
-static  process*    ready_list      = 0;;
+static  u64         time            = 0;
+static  process*    blocked_list    = 0;
+static  process*    ready_list      = 0;
 
 void
 blocked_enq (
@@ -79,4 +79,5 @@ void
 scheduler (
 )
 {
+
 }

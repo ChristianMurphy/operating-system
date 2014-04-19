@@ -12,12 +12,12 @@
 
 static  page        mem[PAGE_COUNT];
 // point to next availible page
-static  u16         page_avail              = 0;
-static  mem_manage  mem_man[PAGE_COUNT]     = {0};
-static  u16         mem_offset              = 1;
-static  u64         vas_vec[VAS_VEC_SIZE]   = {0};
-static  u32         vas_offset              = 0;
-static  u32         vas_count               = VAS_VEC_SIZE;
+static  u16         page_avail            = 0;
+static  mem_manage  mem_man[PAGE_COUNT]   = {0};
+static  u16         mem_offset            = 1;
+static  u64         vas_vec[VAS_VEC_SIZE] = {0};
+static  u32         vas_offset            = 0;
+static  u32         vas_count             = VAS_VEC_SIZE;
 
 void
 read_page (
@@ -88,6 +88,8 @@ vas_free (
 
 u16
 walk_page_ring (
-)
-{
+) {
+    for (u16 counter = 0; counter < PAGE_COUNT; counter++) {
+        mem_man[counter]._used = 0;
+    }
 }
