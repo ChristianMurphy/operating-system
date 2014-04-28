@@ -30,7 +30,20 @@ struct process {
     u16             _sbt        [1024];                     // Swap Block Table
 } process;
 
-void        blocked_enq     (process*   p,      u64     time);
+typedef struct
+{
+    process* _head;
+}
+blocked_list;
+
+typedef struct
+{
+    process* head;
+    process* tail;
+}
+ready_queue;
+
+void        blocked_enq     (process*   p,      u64     time_process);
 process*    blocked_deq     ();
 void        ready_enq       (process*   p,      s32     priority_delta);
 process*    ready_deq       ();
