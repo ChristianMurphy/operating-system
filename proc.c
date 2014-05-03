@@ -12,7 +12,7 @@ static ready_queue ready_medium_queue;
 static ready_queue ready_high_queue;
 static u16 priority_index = 0;
 
-static int counter = 0;
+static int schedule_counter = 0;
 
 typedef struct {
     u64 _t;         // time to which process is allowed to run
@@ -111,6 +111,7 @@ process *blocked_deq(  )
 
 void ready_enq( process * p, s32 priority_delta )
 {
+    //get the current queue
     ready_queue current_priority_queue;
     switch ( p->_priority )
     {
@@ -125,17 +126,21 @@ void ready_enq( process * p, s32 priority_delta )
         break;
     }
 
+    // if it is empty add stuff
     if ( current_priority_queue._head == NULL
          && current_priority_queue._tail == NULL )
     {
         current_priority_queue._head = p;
         current_priority_queue._tail = p;
-    } else
+    }
+    // otherwise append to the end
+    else
     {
         current_priority_queue._tail->_next = p;
         current_priority_queue._tail = p;
     }
 
+    // store back to the correct queue
     switch ( p->_priority )
     {
     case 1:
@@ -152,6 +157,7 @@ void ready_enq( process * p, s32 priority_delta )
 
 process *ready_deq( u8 priority )
 {
+    // get correct queue
     ready_queue current_priority_queue;
     switch ( priority )
     {
@@ -166,10 +172,12 @@ process *ready_deq( u8 priority )
         break;
     }
 
+    // pull off a process
     proc temp = current_priority_queue._head;
     current_priority_queue._head = temp->_next;
     temp->_next = NULL;
 
+    // store back to the currect queue
     switch ( priority )
     {
     case 1:
@@ -283,16 +291,29 @@ u64 process_exec( u64 t,    // time to which process is allowed to run
     }
 }
 
+u64 time_get(  )
+{
+    return time;
+};
+
+void time_adv( u32 delta )
+{
+    time += delta;
+};
+
 void scheduler(  )
 {
-    if ( counter  < 4 ) {
+    if ( schedule_counter < 4 )
+    {
         ready_deq( 1 );
-        counter++;
-    } else if (counter >= 4 && counter < 7 ){
-        ready_deq ( 2 );
-        counter++;
-    } else {
-        ready_deq (3 );
-        counter = 0;
+        schedule_counter++;
+    } else if ( shedule_counter >= 4 && schedule_counter < 7 )
+    {
+        ready_deq( 2 );
+        schedule_counter++;
+    } else
+    {
+        ready_deq( 3 );
+        schedule_counter = 0;
     }
 }
