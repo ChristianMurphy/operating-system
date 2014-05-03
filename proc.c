@@ -109,46 +109,77 @@ process *blocked_deq(  )
 
 void ready_enq( process * p, s32 priority_delta )
 {
-	ready_queue current_priority;
+	ready_queue current_priority_queue;
 	switch ( p->_priority )
 	{
 	case 1:
-		current_priority = ready_high_queue;
+		current_priority_queue = ready_high_queue;
 		break;
 	case 2:
-		current_priority = ready_medium_queue;
+		current_priority_queue = ready_medium_queue;
 		break;
 	case 3:
-		current_priority = ready_low_queue;
+		current_priority_queue = ready_low_queue;
 		break;
 	}
 
-	if ( current_priority._head == NULL && current_priority._tail == NULL )
+	if ( current_priority_queue._head == NULL
+	     && current_priority_queue._tail == NULL )
 	{
-		current_priority._head = p;
-		current_priority._tail = p;
+		current_priority_queue._head = p;
+		current_priority_queue._tail = p;
 	} else
 	{
-		current_priority._tail->_next = p;
-		current_priority._tail = p;
+		current_priority_queue._tail->_next = p;
+		current_priority_queue._tail = p;
 	}
 
 	switch ( p->_priority )
 	{
 	case 1:
-		ready_high_queue current_priority;
+		ready_high_queue current_priority_queue;
 		break;
 	case 2:
-		ready_medium_queue = current_priority;
+		ready_medium_queue = current_priority_queue;
 		break;
 	case 3:
-		ready_low_queue = current_priority;
+		ready_low_queue = current_priority_queue;
 		break;
 	}
 }
 
 process *ready_deq(  )
 {
+	ready_queue current_priority_queue;
+	switch ( p->_priority )
+	{
+	case 1:
+		current_priority_queue = ready_high_queue;
+		break;
+	case 2:
+		current_priority_queue = ready_medium_queue;
+		break;
+	case 3:
+		current_priority_queue = ready_low_queue;
+		break;
+	}
+
+	proc temp = current_priority_queue._head;
+	current_priority_queue._head = temp->_next;
+	temp->_next = NULL;
+
+	switch ( p->_priority )
+	{
+	case 1:
+		ready_high_queue current_priority_queue;
+		break;
+	case 2:
+		ready_medium_queue = current_priority_queue;
+		break;
+	case 3:
+		ready_low_queue = current_priority_queue;
+		break;
+	}
 }
 
 u32 new_code_addr( u32 addr, u32 limit )
