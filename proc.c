@@ -83,6 +83,14 @@ process *blocked_deq(  )
 	process *current_process = blocked.head;
 	process *previous_process = blocked.head;
 
+	if ( current_process._head != NULL
+	     && current_process._head->_next == NULL )
+	{
+		ready_enq( current_process._head );
+		current_process._head = NULL;
+		return;
+	}
+
 	while ( current_process->_next != NULL )
 	{
 		if ( current_process->time >= time )
@@ -101,6 +109,10 @@ process *blocked_deq(  )
 
 void ready_enq( process * p, s32 priority_delta )
 {
+	switch ( p->_priority )
+	{
+
+	}
 }
 
 process *ready_deq(  )
