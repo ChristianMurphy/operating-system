@@ -1,7 +1,7 @@
-#ifndef	_DISK_H_
-#    define	_DISK_H_
+#ifndef _DISK_H_
+#    define _DISK_H_
 
-#    include	"types.h"
+#    include    "types.h"
 
 u64 disk_read( u32 block, u16 addr );
 u64 disk_write( u32 block, u16 addr );

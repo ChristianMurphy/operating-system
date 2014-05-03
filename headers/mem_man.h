@@ -4,15 +4,15 @@
 
 typedef
     struct {
-	u64 _used:1;		//page is being used
-	u64 _dirty:1;		//page has been edited
-	u64 _pinned:1;		//page cannot be swapped
-	 u64:13;
-	u64 _l1i:10;		//level 1 cache
-	 u64:6;
-	u64 _l2i:10;		//level 2 cache
-	 u64:6;
-	u64 _proc:16;		//proceedure number
+    u64 _used:1;        //page is being used
+    u64 _dirty:1;       //page has been edited
+    u64 _pinned:1;      //page cannot be swapped
+     u64:13;
+    u64 _l1i:10;        //level 1 cache
+     u64:6;
+    u64 _l2i:10;        //level 2 cache
+     u64:6;
+    u64 _proc:16;       //proceedure number
 } mem_manage;
 
 void read_page( page * x, u16 y );

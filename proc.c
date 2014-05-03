@@ -1,5 +1,5 @@
-#include	<stdio.h>
-#include	<math.h>
+#include    <stdio.h>
+#include    <math.h>
 #include    "headers/types.h"
 #include    "headers/mem_man.h"
 #include    "headers/proc.h"
@@ -12,276 +12,287 @@ static ready_queue ready_medium_queue;
 static ready_queue ready_high_queue;
 static u16 priority_index = 0;
 
+static int counter = 0;
+
 typedef struct {
-	u64 _t;			// time to which process is allowed to run
-	u32 *_code_addr;
-	u32 *_code_time;
-	u32 *_data_addr;
-	u32 *_data_time;
+    u64 _t;         // time to which process is allowed to run
+    u32 *_code_addr;
+    u32 *_code_time;
+    u32 *_data_addr;
+    u32 *_data_time;
 } run_time;
 
 struct {
-	u64 _start_time;
-	u32 _run_time;
-	u32 _code_size;
-	u32 _data_size;
-	u32 _priority;
+    u64 _start_time;
+    u32 _run_time;
+    u32 _code_size;
+    u32 _data_size;
+    u32 _priority;
 } proc_init[20] =
 {
-	{
-	10ul, 500000, 20000000, 30000000, 1},
-	{
-	11ul, 600000, 40000000, 20000000, 2},
-	{
-	12ul, 700000, 60000000, 10000000, 3},
-	{
-	13ul, 800000, 80000000, 90000000, 1},
-	{
-	14ul, 900000, 10000000, 80000000, 2},
-	{
-	15ul, 500000, 20000000, 70000000, 3},
-	{
-	16ul, 600000, 30000000, 60000000, 1},
-	{
-	17ul, 700000, 40000000, 50000000, 2},
-	{
-	18ul, 800000, 50000000, 40000000, 3},
-	{
-	19ul, 900000, 60000000, 30000000, 1},
-	{
-	20ul, 500000, 70000000, 20000000, 2},
-	{
-	21ul, 600000, 80000000, 10000000, 3},
-	{
-	22ul, 700000, 90000000, 50000000, 1},
-	{
-	23ul, 800000, 10000000, 40000000, 2},
-	{
-	24ul, 900000, 20000000, 30000000, 3},
-	{
-	25ul, 500000, 30000000, 20000000, 1},
-	{
-	26ul, 600000, 40000000, 10000000, 2},
-	{
-	27ul, 700000, 50000000, 60000000, 3},
-	{
-	28ul, 800000, 60000000, 30000000, 1},
-	{
-	29ul, 900000, 70000000, 10000000, 2}
+    {
+    10ul, 500000, 20000000, 30000000, 1},
+    {
+    11ul, 600000, 40000000, 20000000, 2},
+    {
+    12ul, 700000, 60000000, 10000000, 3},
+    {
+    13ul, 800000, 80000000, 90000000, 1},
+    {
+    14ul, 900000, 10000000, 80000000, 2},
+    {
+    15ul, 500000, 20000000, 70000000, 3},
+    {
+    16ul, 600000, 30000000, 60000000, 1},
+    {
+    17ul, 700000, 40000000, 50000000, 2},
+    {
+    18ul, 800000, 50000000, 40000000, 3},
+    {
+    19ul, 900000, 60000000, 30000000, 1},
+    {
+    20ul, 500000, 70000000, 20000000, 2},
+    {
+    21ul, 600000, 80000000, 10000000, 3},
+    {
+    22ul, 700000, 90000000, 50000000, 1},
+    {
+    23ul, 800000, 10000000, 40000000, 2},
+    {
+    24ul, 900000, 20000000, 30000000, 3},
+    {
+    25ul, 500000, 30000000, 20000000, 1},
+    {
+    26ul, 600000, 40000000, 10000000, 2},
+    {
+    27ul, 700000, 50000000, 60000000, 3},
+    {
+    28ul, 800000, 60000000, 30000000, 1},
+    {
+    29ul, 900000, 70000000, 10000000, 2}
 };
 
 void blocked_enq( process * p, u64 time_process )
 {
-	// adding a process to the blocked list
-	p->_next = blocked._head;
-	blocked._head = p;
-	p->_time = time_process + time;
+    // adding a process to the blocked list
+    p->_next = blocked._head;
+    blocked._head = p;
+    p->_time = time_process + time;
 }
 
 process *blocked_deq(  )
 {
-	process *current_process = blocked.head;
-	process *previous_process = blocked.head;
+    process *current_process = blocked.head;
+    process *previous_process = blocked.head;
 
-	if ( current_process._head != NULL
-	     && current_process._head->_next == NULL )
-	{
-		ready_enq( current_process._head );
-		current_process._head = NULL;
-		return;
-	}
+    if ( current_process._head != NULL
+         && current_process._head->_next == NULL )
+    {
+        ready_enq( current_process._head );
+        current_process._head = NULL;
+        return;
+    }
 
-	while ( current_process->_next != NULL )
-	{
-		if ( current_process->time >= time )
-		{
-			ready_enq( current_process );
-			previous_process->_next = current_process->_next;
-			current_process->_next = NULL;
-			current_process = previous_process->_next;
-		} else
-		{
-			previous_process->_next = current_process;
-			current_process = current_process->_next;
-		}
-	}
+    while ( current_process->_next != NULL )
+    {
+        if ( current_process->time >= time )
+        {
+            ready_enq( current_process );
+            previous_process->_next = current_process->_next;
+            current_process->_next = NULL;
+            current_process = previous_process->_next;
+        } else
+        {
+            previous_process->_next = current_process;
+            current_process = current_process->_next;
+        }
+    }
 }
 
 void ready_enq( process * p, s32 priority_delta )
 {
-	ready_queue current_priority_queue;
-	switch ( p->_priority )
-	{
-	case 1:
-		current_priority_queue = ready_high_queue;
-		break;
-	case 2:
-		current_priority_queue = ready_medium_queue;
-		break;
-	case 3:
-		current_priority_queue = ready_low_queue;
-		break;
-	}
+    ready_queue current_priority_queue;
+    switch ( p->_priority )
+    {
+    case 1:
+        current_priority_queue = ready_high_queue;
+        break;
+    case 2:
+        current_priority_queue = ready_medium_queue;
+        break;
+    case 3:
+        current_priority_queue = ready_low_queue;
+        break;
+    }
 
-	if ( current_priority_queue._head == NULL
-	     && current_priority_queue._tail == NULL )
-	{
-		current_priority_queue._head = p;
-		current_priority_queue._tail = p;
-	} else
-	{
-		current_priority_queue._tail->_next = p;
-		current_priority_queue._tail = p;
-	}
+    if ( current_priority_queue._head == NULL
+         && current_priority_queue._tail == NULL )
+    {
+        current_priority_queue._head = p;
+        current_priority_queue._tail = p;
+    } else
+    {
+        current_priority_queue._tail->_next = p;
+        current_priority_queue._tail = p;
+    }
 
-	switch ( p->_priority )
-	{
-	case 1:
-		ready_high_queue current_priority_queue;
-		break;
-	case 2:
-		ready_medium_queue = current_priority_queue;
-		break;
-	case 3:
-		ready_low_queue = current_priority_queue;
-		break;
-	}
+    switch ( p->_priority )
+    {
+    case 1:
+        ready_high_queue current_priority_queue;
+        break;
+    case 2:
+        ready_medium_queue = current_priority_queue;
+        break;
+    case 3:
+        ready_low_queue = current_priority_queue;
+        break;
+    }
 }
 
 process *ready_deq( u8 priority )
 {
-	ready_queue current_priority_queue;
-	switch ( priority )
-	{
-	case 1:
-		current_priority_queue = ready_high_queue;
-		break;
-	case 2:
-		current_priority_queue = ready_medium_queue;
-		break;
-	case 3:
-		current_priority_queue = ready_low_queue;
-		break;
-	}
+    ready_queue current_priority_queue;
+    switch ( priority )
+    {
+    case 1:
+        current_priority_queue = ready_high_queue;
+        break;
+    case 2:
+        current_priority_queue = ready_medium_queue;
+        break;
+    case 3:
+        current_priority_queue = ready_low_queue;
+        break;
+    }
 
-	proc temp = current_priority_queue._head;
-	current_priority_queue._head = temp->_next;
-	temp->_next = NULL;
+    proc temp = current_priority_queue._head;
+    current_priority_queue._head = temp->_next;
+    temp->_next = NULL;
 
-	switch ( priority )
-	{
-	case 1:
-		ready_high_queue current_priority_queue;
-		break;
-	case 2:
-		ready_medium_queue = current_priority_queue;
-		break;
-	case 3:
-		ready_low_queue = current_priority_queue;
-		break;
-	}
+    switch ( priority )
+    {
+    case 1:
+        ready_high_queue current_priority_queue;
+        break;
+    case 2:
+        ready_medium_queue = current_priority_queue;
+        break;
+    case 3:
+        ready_low_queue = current_priority_queue;
+        break;
+    }
 }
 
 u32 new_code_addr( u32 addr, u32 limit )
 {
-	static u32 x[32] = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-		2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 8, 16
-	};
+    static u32 x[32] = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+        2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 8, 16
+    };
 
-	u32 r = rand(  );
-	addr = ( r & 64 ) ? addr + x[r & 31] : addr - x[r & 31];
-	return ( addr > limit ) ? addr = r % limit : addr;
+    u32 r = rand(  );
+    addr = ( r & 64 ) ? addr + x[r & 31] : addr - x[r & 31];
+    return ( addr > limit ) ? addr = r % limit : addr;
 }
 
 u64 new_code_time(  )
 {
-	return 50 + ( rand(  ) & 0xfff );
+    return 50 + ( rand(  ) & 0xfff );
 }
 
 u32 new_data_addr( u32 addr, u32 base, u32 limit )
 {
-	static u32 x[32] = { 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4,
-		5, 5, 6, 6, 7, 7, 8, 8, 9, 10, 11, 12, 16, 20, 28, 40
-	};
+    static u32 x[32] = { 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4,
+        5, 5, 6, 6, 7, 7, 8, 8, 9, 10, 11, 12, 16, 20, 28, 40
+    };
 
-	u32 r = rand(  );
-	addr = ( r & 64 ) ? addr + x[r & 31] : addr - x[r & 31];
-	return ( ( base < addr )
-		 || ( addr > limit ) ) ? addr =
-	    base + ( r % ( limit - base ) ) : addr;
+    u32 r = rand(  );
+    addr = ( r & 64 ) ? addr + x[r & 31] : addr - x[r & 31];
+    return ( ( base < addr )
+         || ( addr > limit ) ) ? addr =
+        base + ( r % ( limit - base ) ) : addr;
 }
 
 u64 new_data_time(  )
 {
-	return 100 + ( rand(  ) & 0x1fff );
+    return 100 + ( rand(  ) & 0x1fff );
 }
 
-u64 process_exec( u64 t,	// time to which process is allowed to run
-		  u32 code_addr,
-		  u32 code_time,
-		  u32 code_limit, u32 data_addr, u32 data_time, u32 data_limit )
+u64 process_exec( u64 t,    // time to which process is allowed to run
+          u32 code_addr,
+          u32 code_time,
+          u32 code_limit, u32 data_addr, u32 data_time, u32 data_limit )
 {
-	u64 time = get_time(  );
-	u32 i;
+    u64 time = get_time(  );
+    u32 i;
 
-	u32 code_trans = virt_to_phys( code_addr );
-	u32 data_trans = virt_to_phys( data_addr );
+    u32 code_trans = virt_to_phys( code_addr );
+    u32 data_trans = virt_to_phys( data_addr );
 
-	if ( !code_trans )
-	{
-		//page_fault code
-	}
+    if ( !code_trans )
+    {
+        //page_fault code
+    }
 
-	if ( !data_trans )
-	{
-		//page_fault code
-	}
+    if ( !data_trans )
+    {
+        //page_fault code
+    }
 
-	while ( 1 )
-	{
-		u32 t_t_t = t - get_time(  );	//time_till_timer
-		if ( code_time < data_time )
-		{
-			if ( code_time > t_t_t )
-			{
-				code_time -= t_t_t;
-				data_time -= t_t_t;
-				return t;
-			}
-			set_time( get_time(  ) + code_time );
-			data_time -= code_time;
-			code_addr = new_code_addr( code_addr, proc_code_limit );
-			code_time = new_code_time(  );
-			code_trans = virt_to_phys_read( code_addr );
-			if ( !code_trans )
-			{
-				//page_fault code
-				return disk_time(  );
-			}
-		} else if ( data_time > t_t_t )
-		{
-			code_time -= t_t_t;
-			data_time -= t_t_t;
-			return t;
-		} else
-		{
-			set_time( get_time(  ) + data_time );
-			code_time -= data_time;
-			data_addr =
-			    new_data_addr( data_addr, proc_code_limit,
-					   proc_data_limit );
-			data_time = new_data_time(  );
-			data_trans = virt_to_phys_write( data_addr );
-			if ( !data_trans )
-			{
-				//page_fault code
-				return disk_time(  );
-			}
-		}
-	}
+    while ( 1 )
+    {
+        u32 t_t_t = t - get_time(  );   //time_till_timer
+        if ( code_time < data_time )
+        {
+            if ( code_time > t_t_t )
+            {
+                code_time -= t_t_t;
+                data_time -= t_t_t;
+                return t;
+            }
+            set_time( get_time(  ) + code_time );
+            data_time -= code_time;
+            code_addr = new_code_addr( code_addr, proc_code_limit );
+            code_time = new_code_time(  );
+            code_trans = virt_to_phys_read( code_addr );
+            if ( !code_trans )
+            {
+                //page_fault code
+                return disk_time(  );
+            }
+        } else if ( data_time > t_t_t )
+        {
+            code_time -= t_t_t;
+            data_time -= t_t_t;
+            return t;
+        } else
+        {
+            set_time( get_time(  ) + data_time );
+            code_time -= data_time;
+            data_addr =
+                new_data_addr( data_addr, proc_code_limit,
+                       proc_data_limit );
+            data_time = new_data_time(  );
+            data_trans = virt_to_phys_write( data_addr );
+            if ( !data_trans )
+            {
+                //page_fault code
+                return disk_time(  );
+            }
+        }
+    }
 }
 
 void scheduler(  )
 {
-
+    if ( counter  < 4 ) {
+        ready_deq( 1 );
+        counter++;
+    } else if (counter >= 4 && counter < 7 ){
+        ready_deq ( 2 );
+        counter++;
+    } else {
+        ready_deq (3 );
+        counter = 0;
+    }
 }

@@ -23,61 +23,61 @@ static u32 vas_count = VAS_VEC_SIZE;
 
 void read_page( page * x, u16 y )
 {
-	u32 i;
-	for ( i = 0; i < 512; ++i )
-		x->_u64[i] = mem[y]._u64[i];
+    u32 i;
+    for ( i = 0; i < 512; ++i )
+        x->_u64[i] = mem[y]._u64[i];
 }
 
 // may need to set dirty bit
 void write_page( page * x, u16 y )
 {
-	u32 i;
-	for ( i = 0; i < 512; ++i )
-		mem[y]._u64[i] = x->_u64[i];
+    u32 i;
+    for ( i = 0; i < 512; ++i )
+        mem[y]._u64[i] = x->_u64[i];
 }
 
 u16 page_alloc(  )
 {
-	// store current free page to temp, pop next avail page
-	u16 t = page_avail;
-	if ( page_avail )
-		page_avail = mem[page_avail]._u16[0];
-	return t;
+    // store current free page to temp, pop next avail page
+    u16 t = page_avail;
+    if ( page_avail )
+        page_avail = mem[page_avail]._u16[0];
+    return t;
 }
 
 void page_free( u16 x )
 {
-	mem[x]._u16[0] = page_avail;
-	page_avail = x;
+    mem[x]._u16[0] = page_avail;
+    page_avail = x;
 }
 
 int vas_alloc( u16 v[], u32 size )
 {
-	//for all the memory you are asking for
-	for ( u32 counter = size; counter > 0; counter-- )
-	{
-		//find first open position
-		u32 position = lsb64( vas_vec[vas_offset] );
-		//allocate that position
-		vas_vec[vas_offset] = vas_vec[vas_offset] || ( 1 << position );
-		//if there is no more room in the block move to next block
-		if ( position > 62 )
-		{
-			vas_offset++;
-		}
-	}
+    //for all the memory you are asking for
+    for ( u32 counter = size; counter > 0; counter-- )
+    {
+        //find first open position
+        u32 position = lsb64( vas_vec[vas_offset] );
+        //allocate that position
+        vas_vec[vas_offset] = vas_vec[vas_offset] || ( 1 << position );
+        //if there is no more room in the block move to next block
+        if ( position > 62 )
+        {
+            vas_offset++;
+        }
+    }
 }
 
 void vas_free( u16 v[], u32 size )
 {
-	static u16 mem_offset = 1;
-	static u64 vas_vec[VAS_VEC_SIZE] = 0;
+    static u16 mem_offset = 1;
+    static u64 vas_vec[VAS_VEC_SIZE] = 0;
 }
 
 u16 walk_page_ring(  )
 {
-	for ( u16 counter = 0; counter < PAGE_COUNT; counter++ )
-	{
-		mem_man[counter]._used = 0;
-	}
+    for ( u16 counter = 0; counter < PAGE_COUNT; counter++ )
+    {
+        mem_man[counter]._used = 0;
+    }
 }
