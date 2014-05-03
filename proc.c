@@ -109,9 +109,41 @@ process *blocked_deq(  )
 
 void ready_enq( process * p, s32 priority_delta )
 {
+	ready_queue current_priority;
 	switch ( p->_priority )
 	{
+	case 1:
+		current_priority = ready_high_queue;
+		break;
+	case 2:
+		current_priority = ready_medium_queue;
+		break;
+	case 3:
+		current_priority = ready_low_queue;
+		break;
+	}
 
+	if ( current_priority._head == NULL && current_priority._tail == NULL )
+	{
+		current_priority._head = p;
+		current_priority._tail = p;
+	} else
+	{
+		current_priority._tail->_next = p;
+		current_priority._tail = p;
+	}
+
+	switch ( p->_priority )
+	{
+	case 1:
+		ready_high_queue current_priority;
+		break;
+	case 2:
+		ready_medium_queue = current_priority;
+		break;
+	case 3:
+		ready_low_queue = current_priority;
+		break;
 	}
 }
 
