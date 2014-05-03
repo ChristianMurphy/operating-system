@@ -148,10 +148,10 @@ void ready_enq( process * p, s32 priority_delta )
 	}
 }
 
-process *ready_deq(  )
+process *ready_deq( u8 priority )
 {
 	ready_queue current_priority_queue;
-	switch ( p->_priority )
+	switch ( priority )
 	{
 	case 1:
 		current_priority_queue = ready_high_queue;
@@ -168,7 +168,7 @@ process *ready_deq(  )
 	current_priority_queue._head = temp->_next;
 	temp->_next = NULL;
 
-	switch ( p->_priority )
+	switch ( priority )
 	{
 	case 1:
 		ready_high_queue current_priority_queue;

@@ -42,6 +42,6 @@ typedef struct {
 void blocked_enq( process * p, u64 time );
 process *blocked_deq(  );
 void ready_enq( process * p, s32 priority_delta );
-process *ready_deq(  );
+process *ready_deq( u8 priority );
 u64 time_get(  );
 void time_adv( u32 delta );
