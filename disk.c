@@ -1,6 +1,8 @@
 #include    <stdio.h>
+#include    <stdlib.h>
 #include    "headers/types.h"
 #include    "headers/util.h"
+#include    "headers/proc.h"
 
 #define SWAP_SIZE       ((1 << 6))
 #define SWAP_SIZE_MASK  (SWAP_SIZE - 1)
@@ -55,8 +57,8 @@ void swap_free( u16 v[], u32 size )
 u64 disk_read( u32 block, u16 addr )
 {
     u32 delta = rand(  );
-    if ( get_time(  ) > disk_time )
-        disk_time = get_time(  );
+    if ( time_get(  ) > disk_time )
+        disk_time = time_get(  );
     if ( delta & 1 )
         disk_time += read_latency + ( delta & 0x3FFFFF );
     else
@@ -71,8 +73,8 @@ u64 disk_read( u32 block, u16 addr )
 u64 disk_write( u32 block, u16 addr )
 {
     u32 delta = rand(  );
-    if ( get_time(  ) > disk_time )
-        disk_time = get_time(  );
+    if ( time_get(  ) > disk_time )
+        disk_time = time_get(  );
     if ( delta & 1 )
         disk_time += write_latency + ( delta & 0x3FFFFF );
     else

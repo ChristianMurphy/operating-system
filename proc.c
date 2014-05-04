@@ -1,4 +1,5 @@
 #include    <stdio.h>
+#include    <stdlib.h>
 #include    <math.h>
 #include    "headers/types.h"
 #include    "headers/mem_man.h"
@@ -185,7 +186,7 @@ u64 process_exec( u64 t,    // time to which process is allowed to run
           u32 code_time,
           u32 code_limit, u32 data_addr, u32 data_time, u32 data_limit )
 {
-    u64 time = get_time(  );
+    u64 time = time_get(  );
     u32 i;
 
     u32 code_trans = virt_to_phys( code_addr );
@@ -203,7 +204,7 @@ u64 process_exec( u64 t,    // time to which process is allowed to run
 
     while ( 1 )
     {
-        u32 t_t_t = t - get_time(  );   //time_till_timer
+        u32 t_t_t = t - time_get(  );   //time_till_timer
         if ( code_time < data_time )
         {
             if ( code_time > t_t_t )
@@ -212,7 +213,7 @@ u64 process_exec( u64 t,    // time to which process is allowed to run
                 data_time -= t_t_t;
                 return t;
             }
-            set_time( get_time(  ) + code_time );
+            set_time( time_get(  ) + code_time );
             data_time -= code_time;
             code_addr = new_code_addr( code_addr, code_limit );
             code_time = new_code_time(  );
@@ -229,7 +230,7 @@ u64 process_exec( u64 t,    // time to which process is allowed to run
             return t;
         } else
         {
-            set_time( get_time(  ) + data_time );
+            set_time( time_get(  ) + data_time );
             code_time -= data_time;
             data_addr =
                 new_data_addr( data_addr, code_limit,
