@@ -10,7 +10,13 @@
  * Christian Murphy
  */
 
-proc_init[100] =
+struct {
+    u64 _start_time;
+    u32 _run_time;
+    u32 _code_size;
+    u32 _data_size;
+    u32 _priority;
+} proc_init[100] =
 {
     {
     10ul, 5100000, 20000000, 30000000, 1},
@@ -229,7 +235,7 @@ int main () {
     return 0;
 
     // new test
-    void time_adv(10);
+    time_adv(10);
     for (int index = 0; index < 100; index++) {
         proc_init[index];
     }

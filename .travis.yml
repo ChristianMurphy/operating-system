@@ -3,5 +3,5 @@ compiler:
 - gcc
 - clang
 script:
-- cc -std=c99 *.c
+- cc *.c
 - "./a.out"

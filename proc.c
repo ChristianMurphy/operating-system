@@ -26,56 +26,6 @@ typedef struct {
     u32 *_data_time;
 } run_time;
 
-struct {
-    u64 _start_time;
-    u32 _run_time;
-    u32 _code_size;
-    u32 _data_size;
-    u32 _priority;
-} proc_init[20] =
-{
-    {
-    10ul, 500000, 20000000, 30000000, 1},
-    {
-    11ul, 600000, 40000000, 20000000, 2},
-    {
-    12ul, 700000, 60000000, 10000000, 3},
-    {
-    13ul, 800000, 80000000, 90000000, 1},
-    {
-    14ul, 900000, 10000000, 80000000, 2},
-    {
-    15ul, 500000, 20000000, 70000000, 3},
-    {
-    16ul, 600000, 30000000, 60000000, 1},
-    {
-    17ul, 700000, 40000000, 50000000, 2},
-    {
-    18ul, 800000, 50000000, 40000000, 3},
-    {
-    19ul, 900000, 60000000, 30000000, 1},
-    {
-    20ul, 500000, 70000000, 20000000, 2},
-    {
-    21ul, 600000, 80000000, 10000000, 3},
-    {
-    22ul, 700000, 90000000, 50000000, 1},
-    {
-    23ul, 800000, 10000000, 40000000, 2},
-    {
-    24ul, 900000, 20000000, 30000000, 3},
-    {
-    25ul, 500000, 30000000, 20000000, 1},
-    {
-    26ul, 600000, 40000000, 10000000, 2},
-    {
-    27ul, 700000, 50000000, 60000000, 3},
-    {
-    28ul, 800000, 60000000, 30000000, 1},
-    {
-    29ul, 900000, 70000000, 10000000, 2}
-};
-
 void blocked_enq( process * p, u64 time_process )
 {
     // adding a process to the blocked list
@@ -178,8 +128,8 @@ process *ready_deq( u8 priority )
 
     // pull off a process
     process temp = *current_priority_queue.head;
-    current_priority_queue.head = temp->_next;
-    temp->_next = NULL;
+    current_priority_queue.head = temp._next;
+    temp._next = NULL;
 
     // store back to the currect queue
     switch ( priority )
@@ -264,7 +214,7 @@ u64 process_exec( u64 t,    // time to which process is allowed to run
             }
             set_time( get_time(  ) + code_time );
             data_time -= code_time;
-            code_addr = new_code_addr( code_addr, proc_code_limit );
+            code_addr = new_code_addr( code_addr, code_limit );
             code_time = new_code_time(  );
             code_trans = virt_to_phys_read( code_addr );
             if ( !code_trans )
@@ -282,8 +232,8 @@ u64 process_exec( u64 t,    // time to which process is allowed to run
             set_time( get_time(  ) + data_time );
             code_time -= data_time;
             data_addr =
-                new_data_addr( data_addr, proc_code_limit,
-                       proc_data_limit );
+                new_data_addr( data_addr, code_limit,
+                       data_limit );
             data_time = new_data_time(  );
             data_trans = virt_to_phys_write( data_addr );
             if ( !data_trans )
