@@ -16,6 +16,7 @@ static ready_queue ready_low_queue;
 static ready_queue ready_medium_queue;
 static ready_queue ready_high_queue;
 static u16 priority_index = 0;
+static process temporary_process;
 
 static int schedule_counter = 0;
 
@@ -62,6 +63,8 @@ process *blocked_deq(  )
             current_process = current_process->_next;
         }
     }
+
+    return current_process;
 }
 
 void ready_enq( process * p, s32 priority_delta )
@@ -128,9 +131,9 @@ process *ready_deq( u8 priority )
     }
 
     // pull off a process
-    process temp = *current_priority_queue.head;
-    current_priority_queue.head = temp._next;
-    temp._next = NULL;
+    temporary_process = *current_priority_queue.head;
+    current_priority_queue.head = temporary_process._next;
+    temporary_process._next = NULL;
 
     // store back to the currect queue
     switch ( priority )
@@ -145,6 +148,8 @@ process *ready_deq( u8 priority )
         ready_low_queue = current_priority_queue;
         break;
     }
+
+    return &temporary_process;
 }
 
 u32 new_code_addr( u32 addr, u32 limit )
@@ -213,7 +218,7 @@ u64 process_exec( u64 t,    // time to which process is allowed to run
                 data_time -= t_t_t;
                 return t;
             }
-            set_time( time_get(  ) + code_time );
+            time_adv( code_time );
             data_time -= code_time;
             code_addr = new_code_addr( code_addr, code_limit );
             code_time = new_code_time(  );
@@ -230,7 +235,7 @@ u64 process_exec( u64 t,    // time to which process is allowed to run
             return t;
         } else
         {
-            set_time( time_get(  ) + data_time );
+            time_adv( data_time );
             code_time -= data_time;
             data_addr =
                 new_data_addr( data_addr, code_limit,

@@ -34,8 +34,7 @@ void read_page( page * x, u16 y )
 // may need to set dirty bit
 void write_page( page * x, u16 y )
 {
-    u32 i;
-    for ( i = 0; i < 512; ++i )
+    for ( u32 i = 0; i < 512; ++i )
         mem[y]._u64[i] = x->_u64[i];
 }
 
@@ -69,6 +68,9 @@ int vas_alloc( u16 v[], u32 size )
             vas_offset++;
         }
     }
+
+    // if found enough space
+    return 0;
 }
 
 void vas_free( u16 v[], u32 size )
@@ -93,8 +95,11 @@ void vas_free( u16 v[], u32 size )
 
 u16 walk_page_ring(  )
 {
-    for ( u16 counter = 0; counter < PAGE_COUNT; counter++ )
+    u16 counter;
+    for ( counter = 0; counter < PAGE_COUNT; counter++ )
     {
         mem_man[counter]._used = 0;
     }
+
+    return counter;
 }
