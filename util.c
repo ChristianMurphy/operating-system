@@ -166,18 +166,3 @@ u32 lsb64( u64 x )
 
     return pos;
 }
-
-int main(  )
-{
-    int i;
-    int x;
-    int y;
-    int z;
-
-    for ( i = 0; i < 256; ++i )
-    {
-        x = lsb8( i );
-        printf( "lsb8(i) = %02x\n", x );
-    }
-    return 0;
-}

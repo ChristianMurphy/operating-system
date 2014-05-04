@@ -215,6 +215,20 @@ struct {
 };
 
 int main () {
+    // old test
+    int i;
+    int x;
+    int y;
+    int z;
+
+    for ( i = 0; i < 256; ++i )
+    {
+        x = lsb8( i );
+        printf( "lsb8(i) = %02x\n", x );
+    }
+    return 0;
+
+    // new test
     void time_adv(10);
     for (int index = 0; index < 100; index++) {
         proc_init[index];
