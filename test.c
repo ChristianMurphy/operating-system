@@ -1,4 +1,8 @@
-#include "headers/types.h"
+#include    <stdio.h>
+#include    <math.h>
+#include    "headers/types.h"
+#include    "headers/mem_man.h"
+#include    "headers/proc.h"
 
 struct {
     u64 _start_time;
@@ -211,5 +215,16 @@ struct {
 };
 
 int main () {
+    void time_adv(10);
+    for (int index = 0; index < 100; index++) {
+        proc_init[index];
+    }
+    /*
+    while ( true ) {
 
+        //if ready queues are empty
+        if (false) {
+            return 0;
+        }
+    }*/
 }

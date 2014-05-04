@@ -70,8 +70,22 @@ int vas_alloc( u16 v[], u32 size )
 
 void vas_free( u16 v[], u32 size )
 {
-    static u16 mem_offset = 1;
-    static u64 vas_vec[VAS_VEC_SIZE] = 0;
+    for ( int index = 0; index < size; index++ )
+    {
+        u16 current_address = v[index];
+        //getting row
+        u16 bit_position = current_address & 0x00FF;
+        //offset starts here
+        u16 vas_offset_temporary = current_address >> 0;
+
+        //creating mask to free a position
+        u64 flipped_bit = ~( 1 << bit_position );
+        //free up the page
+        vas_vec[vas_offset_temporary] =
+            vas_vec[vas_offset_temporary] & flipped_bit;
+        //there is more free space
+        vas_count++;
+    }
 }
 
 u16 walk_page_ring(  )
