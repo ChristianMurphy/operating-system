@@ -1,16 +1,16 @@
 #include    <stdio.h>
 #include    <math.h>
+#include    "proc.c"
 #include    "headers/types.h"
 #include    "headers/mem_man.h"
 #include    "headers/proc.h"
+#include    "headers/util.h"
 
-struct {
-    u64 _start_time;
-    u32 _run_time;
-    u32 _code_size;
-    u32 _data_size;
-    u32 _priority;
-} proc_init[100] =
+/**
+ * Christian Murphy
+ */
+
+proc_init[100] =
 {
     {
     10ul, 5100000, 20000000, 30000000, 1},

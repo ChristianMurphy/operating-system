@@ -2,6 +2,10 @@
 #include "types.h"
 #include "proc.h"
 
+/**
+ * Christian Murphy
+ */
+
 typedef
     struct {
     u64 _used:1;        //page is being used

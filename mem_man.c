@@ -1,4 +1,3 @@
-#pragma once
 #include    <stdio.h>
 #include    "headers/types.h"
 #include    "headers/proc.h"
@@ -9,6 +8,10 @@
 #define PAGE_MASK           (PAGE_COUNT - 1)
 #define VAS_VEC_SIZE        (1 << 6)
 #define VAS_VEC_SIZE_MASK   (VAS_VEC_SIZE - 1)
+
+/**
+ * Christian Murphy
+ */
 
 static page mem[PAGE_COUNT];
 // point to next availible page

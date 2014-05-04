@@ -2,6 +2,10 @@
 
 #    include    "types.h"
 
+/**
+ * Christian Murphy
+ */
+
 u64 disk_read( u32 block, u16 addr );
 u64 disk_write( u32 block, u16 addr );
 int in_alloc( u16 v[], u32 size );

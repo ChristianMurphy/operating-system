@@ -1,6 +1,10 @@
 #include    <stdio.h>
 #include    "headers/types.h"
 
+/**
+ * Christian Murphy
+ */
+
 u32 lsb8( u8 x )
 {
     u32 pos = 0;

@@ -4,6 +4,10 @@
 #include    "headers/mem_man.h"
 #include    "headers/proc.h"
 
+/**
+ * Christian Murphy
+ */
+
 static u64 time = 0;
 static process *ready_list = 0;
 static blocked_list blocked;
@@ -82,22 +86,22 @@ void blocked_enq( process * p, u64 time_process )
 
 process *blocked_deq(  )
 {
-    process *current_process = blocked.head;
-    process *previous_process = blocked.head;
+    process *current_process = blocked._head;
+    process *previous_process = blocked._head;
 
-    if ( current_process._head != NULL
-         && current_process._head->_next == NULL )
+    if ( current_process -> _next != NULL
+         && current_process -> _next -> _next == NULL )
     {
-        ready_enq( current_process._head );
-        current_process._head = NULL;
-        return;
+        ready_enq( current_process -> _next , current_process -> _next -> _priority );
+        current_process -> _next = NULL;
+        return current_process;
     }
 
     while ( current_process->_next != NULL )
     {
-        if ( current_process->time >= time )
+        if ( current_process->_time >= time )
         {
-            ready_enq( current_process );
+            ready_enq( current_process , current_process -> _priority );
             previous_process->_next = current_process->_next;
             current_process->_next = NULL;
             current_process = previous_process->_next;
@@ -127,24 +131,24 @@ void ready_enq( process * p, s32 priority_delta )
     }
 
     // if it is empty add stuff
-    if ( current_priority_queue._head == NULL
-         && current_priority_queue._tail == NULL )
+    if ( current_priority_queue.head == NULL
+         && current_priority_queue.tail == NULL )
     {
-        current_priority_queue._head = p;
-        current_priority_queue._tail = p;
+        current_priority_queue.head = p;
+        current_priority_queue.tail = p;
     }
     // otherwise append to the end
     else
     {
-        current_priority_queue._tail->_next = p;
-        current_priority_queue._tail = p;
+        current_priority_queue.tail->_next = p;
+        current_priority_queue.tail = p;
     }
 
     // store back to the correct queue
     switch ( p->_priority )
     {
     case 1:
-        ready_high_queue current_priority_queue;
+        ready_high_queue = current_priority_queue;
         break;
     case 2:
         ready_medium_queue = current_priority_queue;
@@ -173,15 +177,15 @@ process *ready_deq( u8 priority )
     }
 
     // pull off a process
-    proc temp = current_priority_queue._head;
-    current_priority_queue._head = temp->_next;
+    process temp = *current_priority_queue.head;
+    current_priority_queue.head = temp->_next;
     temp->_next = NULL;
 
     // store back to the currect queue
     switch ( priority )
     {
     case 1:
-        ready_high_queue current_priority_queue;
+        ready_high_queue = current_priority_queue;
         break;
     case 2:
         ready_medium_queue = current_priority_queue;
@@ -307,7 +311,7 @@ void scheduler(  )
     {
         ready_deq( 1 );
         schedule_counter++;
-    } else if ( shedule_counter >= 4 && schedule_counter < 7 )
+    } else if ( schedule_counter >= 4 && schedule_counter < 7 )
     {
         ready_deq( 2 );
         schedule_counter++;

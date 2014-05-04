@@ -1,9 +1,13 @@
 #include    <stdio.h>
-#include    "types.h"
-#include    "util.h"
+#include    "headers/types.h"
+#include    "headers/util.h"
 
 #define SWAP_SIZE       ((1 << 6))
 #define SWAP_SIZE_MASK  (SWAP_SIZE - 1)
+
+/**
+ * Christian Murphy
+ */
 
 static u64 avail[SWAP_SIZE] = { 1, 0 };
 

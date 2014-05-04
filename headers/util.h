@@ -1,6 +1,10 @@
 #pragma once
 #include    "types.h"
 
+/**
+ * Christian Murphy
+ */
+
 u32 lsb8( u8 x );
 u32 lsb16( u16 x );
 u32 lsb32( u32 x );

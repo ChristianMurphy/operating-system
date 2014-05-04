@@ -1,6 +1,10 @@
 #pragma once
 #include "types.h"
 
+/**
+ * Christian Murphy
+ */
+
 typedef
     struct process {
     u16 _pid;

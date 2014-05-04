@@ -1,6 +1,10 @@
 #pragma once
 #define CASE    break; case
 
+/**
+ * Christian Murphy
+ */
+
 typedef char s8;
 typedef unsigned char u8;
 typedef short s16;
