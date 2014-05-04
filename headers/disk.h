@@ -1,5 +1,4 @@
-#ifndef _DISK_H_
-#    define _DISK_H_
+#pragma once
 
 #    include    "types.h"
 
@@ -11,5 +10,3 @@ int lb_alloc( u16 v[], u32 size );
 void lb_free( u16 v[], u32 size );
 int sb_alloc( u16 v[], u32 size );
 void sb_free( u16 v[], u32 size );
-
-#endif
