@@ -1,6 +1,5 @@
 #include    <stdio.h>
 #include    <math.h>
-#include    "proc.c"
 #include    "headers/types.h"
 #include    "headers/mem_man.h"
 #include    "headers/proc.h"
@@ -237,7 +236,7 @@ int main () {
     // new test
     time_adv(10);
     for (int index = 0; index < 100; index++) {
-        proc_init[index];
+        //proc_init[index];
     }
     /*
     while ( true ) {

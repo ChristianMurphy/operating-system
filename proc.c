@@ -226,7 +226,7 @@ u64 process_exec( u64 t,    // time to which process is allowed to run
             if ( !code_trans )
             {
                 //page_fault code
-                return disk_time(  );
+                return time_get();
             }
         } else if ( data_time > t_t_t )
         {
@@ -245,7 +245,7 @@ u64 process_exec( u64 t,    // time to which process is allowed to run
             if ( !data_trans )
             {
                 //page_fault code
-                return disk_time(  );
+                return time_get();
             }
         }
     }
