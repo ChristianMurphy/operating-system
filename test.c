@@ -219,7 +219,8 @@ struct {
     15000000090029ul, 9400000, 70000000, 10000000, 2}
 };
 
-int main () {
+int main(  )
+{
     // old test
     int i;
     int x;
@@ -234,16 +235,17 @@ int main () {
     return 0;
 
     // new test
-    time_adv(10);
-    for (int index = 0; index < 100; index++) {
+    time_adv( 10 );
+    for ( int index = 0; index < 100; index++ )
+    {
         //proc_init[index];
     }
     /*
-    while ( true ) {
+       while ( true ) {
 
-        //if ready queues are empty
-        if (false) {
-            return 0;
-        }
-    }*/
+       //if ready queues are empty
+       if (false) {
+       return 0;
+       }
+       } */
 }

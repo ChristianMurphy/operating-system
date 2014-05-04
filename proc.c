@@ -41,11 +41,12 @@ process *blocked_deq(  )
     process *current_process = blocked._head;
     process *previous_process = blocked._head;
 
-    if ( current_process -> _next != NULL
-         && current_process -> _next -> _next == NULL )
+    if ( current_process->_next != NULL
+         && current_process->_next->_next == NULL )
     {
-        ready_enq( current_process -> _next , current_process -> _next -> _priority );
-        current_process -> _next = NULL;
+        ready_enq( current_process->_next,
+               current_process->_next->_priority );
+        current_process->_next = NULL;
         return current_process;
     }
 
@@ -53,7 +54,8 @@ process *blocked_deq(  )
     {
         if ( current_process->_time >= time )
         {
-            ready_enq( current_process , current_process -> _priority );
+            ready_enq( current_process,
+                   current_process->_priority );
             previous_process->_next = current_process->_next;
             current_process->_next = NULL;
             current_process = previous_process->_next;
@@ -226,7 +228,7 @@ u64 process_exec( u64 t,    // time to which process is allowed to run
             if ( !code_trans )
             {
                 //page_fault code
-                return time_get();
+                return time_get(  );
             }
         } else if ( data_time > t_t_t )
         {
@@ -238,14 +240,13 @@ u64 process_exec( u64 t,    // time to which process is allowed to run
             time_adv( data_time );
             code_time -= data_time;
             data_addr =
-                new_data_addr( data_addr, code_limit,
-                       data_limit );
+                new_data_addr( data_addr, code_limit, data_limit );
             data_time = new_data_time(  );
             data_trans = virt_to_phys_write( data_addr );
             if ( !data_trans )
             {
                 //page_fault code
-                return time_get();
+                return time_get(  );
             }
         }
     }
