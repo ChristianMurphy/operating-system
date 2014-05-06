@@ -9,7 +9,6 @@ typedef
     struct process {
     u16 _pid;
     u32 _virtual_address_space; // Virtual Adddress Size
-    dev_type _wait_on;
     u32 _code_size;
     u32 _data_size;
     u32 _code_address;
@@ -17,6 +16,7 @@ typedef
     u32 _code_time;
     u32 _data_time;
     u64 _time;
+    u64 _blocked_timer;
     u32 _priority;
     struct process *_next;
     u16 _page_table_index;  // Page Table Index

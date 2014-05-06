@@ -61,7 +61,7 @@ void blocked_enq( process * p, u64 time_process )
     // adding a process to the blocked list
     p->_next = blocked._head;
     blocked._head = p;
-    p->_time = time_process + time;
+    p->_blocked_time = time_process + time;
 }
 
 process *blocked_deq(  )
@@ -81,7 +81,7 @@ process *blocked_deq(  )
 
     while ( current_process->_next != NULL )
     {
-        if ( current_process->_time >= time )
+        if ( current_process->_blocked_time >= time )
         {
             ready_enq( current_process,
                    current_process->_priority );
