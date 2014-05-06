@@ -28,6 +28,32 @@ typedef struct {
     u32 *_data_time;
 } run_time;
 
+void initiate_queues(  )
+{
+    blocked._head = NULL;
+
+    ready_high_queue.head = NULL;
+    ready_high_queue.tail = NULL;
+
+    ready_medium_queue.head = NULL;
+    ready_medium_queue.tail = NULL;
+
+    ready_low_queue.head = NULL;
+    ready_low_queue.tail = NULL;
+}
+
+void initiate_process( u8 priority, u32 code_size, u32 data_size, u64 time )
+{
+    proc new_process;
+    new_process->vas = code_size + data_size;
+    new_process->_priority = priority;
+    new_process->time = time;
+    new_process->code_addr = 0;
+    new_process->data_addr = NULL;
+    new_process->code_time = NULL;
+    new_process->data_time = NULL;
+}
+
 void blocked_enq( process * p, u64 time_process )
 {
     // adding a process to the blocked list
@@ -211,13 +237,13 @@ u64 process_exec( u64 t,    // time to which process is allowed to run
 
     while ( 1 )
     {
-        u32 t_t_t = t - time_get(  );   //time_till_timer
+        u32 time_till_timer = t - time_get(  );
         if ( code_time < data_time )
         {
-            if ( code_time > t_t_t )
+            if ( code_time > time_till_timer )
             {
-                code_time -= t_t_t;
-                data_time -= t_t_t;
+                code_time -= time_till_timer;
+                data_time -= time_till_timer;
                 return t;
             }
             time_adv( code_time );
@@ -230,10 +256,10 @@ u64 process_exec( u64 t,    // time to which process is allowed to run
                 //page_fault code
                 return time_get(  );
             }
-        } else if ( data_time > t_t_t )
+        } else if ( data_time > time_till_timer )
         {
-            code_time -= t_t_t;
-            data_time -= t_t_t;
+            code_time -= time_till_timer;
+            data_time -= time_till_timer;
             return t;
         } else
         {
@@ -268,7 +294,7 @@ void scheduler(  )
     {
         ready_deq( 1 );
         schedule_counter++;
-    } else if ( schedule_counter >= 4 && schedule_counter < 7 )
+    } else if ( schedule_counter < 7 )
     {
         ready_deq( 2 );
         schedule_counter++;
