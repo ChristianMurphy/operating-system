@@ -7,7 +7,7 @@
 
 typedef
     struct process {
-    u16 _pid;
+    u16 _process_id;
     u32 _virtual_address_space; // Virtual Adddress Size
     u32 _code_size;
     u32 _data_size;

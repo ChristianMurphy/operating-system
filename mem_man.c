@@ -108,7 +108,7 @@ u32 virtual_address_to_physical_address( u32 *address, process *current_process 
     u32 level_one_index = *address >> 22;
     u32 level_two_index = ((*address >> 12) & 0x3FF);
 
-    u16 level_one_address = current_process -> _pid;
+    u16 level_one_address = current_process -> _process_id;
     page level_one = mem[level_one_index];
     u32 level_two_address = level_one._u32[level_one_index];
 
