@@ -44,14 +44,14 @@ void initiate_queues(  )
 
 void initiate_process( u8 priority, u32 code_size, u32 data_size, u64 time )
 {
-    proc new_process;
-    new_process->vas = code_size + data_size;
-    new_process->_priority = priority;
-    new_process->time = time;
-    new_process->code_addr = 0;
-    new_process->data_addr = NULL;
-    new_process->code_time = NULL;
-    new_process->data_time = NULL;
+    process new_process;
+    new_process._virtual_address_space = code_size + data_size;
+    new_process._priority = priority;
+    new_process._time = time;
+    new_process._code_address = 0;
+    new_process._data_address = NULL;
+    new_process._code_time = NULL;
+    new_process._data_time = NULL;
 }
 
 void blocked_enq( process * p, u64 time_process )
@@ -214,16 +214,14 @@ u64 new_data_time(  )
     return 100 + ( rand(  ) & 0x1fff );
 }
 
-u64 process_exec( u64 t,    // time to which process is allowed to run
-          u32 code_addr,
-          u32 code_time,
-          u32 code_limit, u32 data_addr, u32 data_time, u32 data_limit )
+u64 process_exec( process * current_process, u32 code_limit, u32 data_limit,
+          u32 t )
 {
     u64 time = time_get(  );
     u32 i;
 
-    u32 code_trans = virt_to_phys( code_addr );
-    u32 data_trans = virt_to_phys( data_addr );
+    u32 code_trans = virt_to_phys( current_process->_code_address );
+    u32 data_trans = virt_to_phys( current_process->_data_address );
 
     if ( !code_trans )
     {
@@ -238,37 +236,45 @@ u64 process_exec( u64 t,    // time to which process is allowed to run
     while ( 1 )
     {
         u32 time_till_timer = t - time_get(  );
-        if ( code_time < data_time )
+        if ( current_process->_code_time < current_process->_data_time )
         {
-            if ( code_time > time_till_timer )
+            if ( current_process->_code_time > time_till_timer )
             {
-                code_time -= time_till_timer;
-                data_time -= time_till_timer;
+                current_process->_code_time -= time_till_timer;
+                current_process->_data_time -= time_till_timer;
                 return t;
             }
-            time_adv( code_time );
-            data_time -= code_time;
-            code_addr = new_code_addr( code_addr, code_limit );
-            code_time = new_code_time(  );
-            code_trans = virt_to_phys_read( code_addr );
+            time_adv( current_process->_code_time );
+            current_process->_data_time -=
+                current_process->_code_time;
+            current_process->_code_address =
+                new_code_addr( current_process->_code_address,
+                       code_limit );
+            current_process->_code_time = new_code_time(  );
+            code_trans =
+                virt_to_phys_read( current_process->_code_address );
             if ( !code_trans )
             {
                 //page_fault code
                 return time_get(  );
             }
-        } else if ( data_time > time_till_timer )
+        } else if ( current_process->_data_time > time_till_timer )
         {
-            code_time -= time_till_timer;
-            data_time -= time_till_timer;
+            current_process->_code_time -= time_till_timer;
+            current_process->_data_time -= time_till_timer;
             return t;
         } else
         {
-            time_adv( data_time );
-            code_time -= data_time;
-            data_addr =
-                new_data_addr( data_addr, code_limit, data_limit );
-            data_time = new_data_time(  );
-            data_trans = virt_to_phys_write( data_addr );
+            time_adv( current_process->_data_time );
+            current_process->_code_time -=
+                current_process->_data_time;
+            current_process->_data_address =
+                new_data_addr( current_process->_data_address,
+                       code_limit, data_limit );
+            current_process->_data_time = new_data_time(  );
+            data_trans =
+                virt_to_phys_write( current_process->
+                        _data_address );
             if ( !data_trans )
             {
                 //page_fault code
