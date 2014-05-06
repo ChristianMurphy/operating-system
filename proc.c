@@ -57,6 +57,7 @@ void initiate_process( u8 priority, u32 code_size, u32 data_size, u64 time )
 
 void blocked_enq( process * p, u64 time_process )
 {
+    printf("Process PID #%d is now blocked\n", p -> _pid);
     // adding a process to the blocked list
     p->_next = blocked._head;
     blocked._head = p;
@@ -74,6 +75,7 @@ process *blocked_deq(  )
         ready_enq( current_process->_next,
                current_process->_next->_priority );
         current_process->_next = NULL;
+        printf("Process PID #%d is no longer blocked\n", current_process -> _pid);
         return current_process;
     }
 
@@ -93,11 +95,13 @@ process *blocked_deq(  )
         }
     }
 
+    printf("Process PID #%d is no longer blocked\n", current_process -> _pid);
     return current_process;
 }
 
 void ready_enq( process * p, s32 priority_delta )
 {
+    printf("Process PID #%d is now ready\n", p -> _pid);
     //get the current queue
     ready_queue current_priority_queue;
     switch ( p->_priority )
@@ -178,6 +182,7 @@ process *ready_deq( u8 priority )
         break;
     }
 
+    printf("Process PID #%d is no longer ready\n", temporary_process._pid);
     return &temporary_process;
 }
 
