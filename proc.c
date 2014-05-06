@@ -44,11 +44,11 @@ void initiate_queues(  )
 
 void initiate_process( u8 priority, u32 code_size, u32 data_size, u64 time )
 {
+    process *new_process = malloc( sizeof( *new_process ) );
     int there_is_there_enough_space = vas_alloc( new_process->_swap_block_table, new_process -> _virtual_address_space );
 
     if ( there_is_there_enough_space )
     {
-        process *new_process = malloc( sizeof( *new_process ) );
         new_process->_virtual_address_space = code_size + data_size;
         new_process->_priority = priority;
         new_process->_time = time;
@@ -261,6 +261,7 @@ void process_exec( process * current_process, u32 code_limit, u32 data_limit,
 
     while ( timer )
     {
+        // run the code time
         if ( current_process->_code_time < current_process->_data_time )
         {
             if ( current_process->_code_time > timer )
@@ -284,11 +285,12 @@ void process_exec( process * current_process, u32 code_limit, u32 data_limit,
 
             if ( !code_translation )
             {
-                page_fault( current_process->_data_address,
+                page_fault( current_process->_code_address,
                         current_process );
             }
         }
 
+        // run the data time
         else
         {
             if ( current_process->_data_time > timer )
