@@ -44,14 +44,15 @@ void initiate_queues(  )
 
 void initiate_process( u8 priority, u32 code_size, u32 data_size, u64 time )
 {
-    process new_process;
+    process new_process = malloc(sizeof(*process));
     new_process._virtual_address_space = code_size + data_size;
     new_process._priority = priority;
     new_process._time = time;
     new_process._code_address = 0;
-    new_process._data_address = NULL;
-    new_process._code_time = NULL;
-    new_process._data_time = NULL;
+    new_process._data_address = 0;
+    new_process._code_time = 0;
+    new_process._data_time = 0;
+    ready_enq( new_process );
 }
 
 void blocked_enq( process * p, u64 time_process )
@@ -220,8 +221,8 @@ u64 process_exec( process * current_process, u32 code_limit, u32 data_limit,
     u64 time = time_get(  );
     u32 i;
 
-    u32 code_trans = virt_to_phys( current_process->_code_address );
-    u32 data_trans = virt_to_phys( current_process->_data_address );
+    u32 code_trans = virtual_address_to_physical_address( NULL, current_process->_code_address );
+    u32 data_trans = virtual_address_to_physical_address( NULL, current_process->_data_address );
 
     if ( !code_trans )
     {

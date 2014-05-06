@@ -24,15 +24,14 @@ static u64 vas_vec[VAS_VEC_SIZE] = { 0 };
 static u32 vas_offset = 0;
 static u32 vas_count = VAS_VEC_SIZE;
 
-void read_page( page * x, u16 y )
+void write_page( page * x, u16 y )
 {
-    u32 i;
-    for ( i = 0; i < 512; ++i )
+    for ( u32 i = 0; i < 512; ++i )
         x->_u64[i] = mem[y]._u64[i];
 }
 
 // may need to set dirty bit
-void write_page( page * x, u16 y )
+void read_page( page * x, u16 y )
 {
     for ( u32 i = 0; i < 512; ++i )
         mem[y]._u64[i] = x->_u64[i];
@@ -102,4 +101,32 @@ u16 walk_page_ring(  )
     }
 
     return counter;
+}
+
+u32 virtual_address_to_physical_address( u32 address, process *current_process )
+{
+    //get top ten bits
+    u32 level_one_index = address >> 22;
+    u32 level_two_index = ((address >> 12) & 0x3FF);
+
+    u16 level_one_address = current_process -> _pid;
+    page level_one = mem[level_one_index];
+    u32 level_two_address = level_one._u32[level_one_index];
+
+    // if there is one level two address
+    if ( !level_two_address )
+    {
+        return 0;
+    }
+
+    page level_two = mem[level_two_index];
+    u32 physical_address = level_two._u32[level_one_index];
+
+    // if the physical address does not exist
+    if ( !physical_address )
+    {
+        return 0;
+    }
+
+    return physical_address;
 }
