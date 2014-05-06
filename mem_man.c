@@ -104,7 +104,7 @@ u16 walk_page_ring(  )
 
 void page_fault( u32 address, process * faulting_process )
 {
-    printf( "process PID #%d at address %d\n",
+    printf( "process PID #%d at address %d has faulted\n",
         faulting_process->_process_id, address );
     u16 allocate = page_alloc(  );
 

@@ -52,6 +52,16 @@ void initiate_process( u8 priority, u32 code_size, u32 data_size, u64 time )
     new_process->_data_address = 0;
     new_process->_code_time = 0;
     new_process->_data_time = 0;
+
+    u16 allocate = page_alloc();
+
+    if (allocate)
+    {
+        u16 swap_page = walk_page_ring();
+        page_free(swap_page);
+        allocate = page_alloc();
+    }
+
     ready_enq( new_process, new_process->_priority );
 }
 

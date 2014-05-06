@@ -19,6 +19,7 @@ typedef
     u64 _proc:16;       //proceedure number
 } mem_manage;
 
+u16 walk_page_ring(  );
 void read_page_from_memory( u16 address );
 void write_page_to_memory( u16 address );
 void build_mem_avail(  );
