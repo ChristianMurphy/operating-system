@@ -215,14 +215,14 @@ u64 new_data_time(  )
     return 100 + ( rand(  ) & 0x1fff );
 }
 
-u64 process_exec( process * current_process, u32 code_limit, u32 data_limit,
+u64 process_exec( process *current_process, u32 code_limit, u32 data_limit,
           u32 t )
 {
     u64 time = time_get(  );
     u32 i;
 
-    u32 code_trans = virtual_address_to_physical_address( NULL, current_process->_code_address );
-    u32 data_trans = virtual_address_to_physical_address( NULL, current_process->_data_address );
+    u32 code_trans = virtual_address_to_physical_address( NULL, current_process );
+    u32 data_trans = virtual_address_to_physical_address( NULL, current_process );
 
     if ( !code_trans )
     {

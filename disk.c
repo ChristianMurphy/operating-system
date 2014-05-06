@@ -3,6 +3,7 @@
 #include    "headers/types.h"
 #include    "headers/util.h"
 #include    "headers/proc.h"
+#include    "headers/disk.h"
 
 #define SWAP_SIZE       ((1 << 6))
 #define SWAP_SIZE_MASK  (SWAP_SIZE - 1)
