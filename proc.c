@@ -231,12 +231,12 @@ u64 process_exec( process *current_process, u32 code_limit, u32 data_limit,
 
     if ( !code_trans )
     {
-        //page_fault code
+        page_fault( current_process -> _data_address, current_process );
     }
 
     if ( !data_trans )
     {
-        //page_fault code
+        page_fault( current_process -> _data_address, current_process );
     }
 
     while ( 1 )
@@ -261,7 +261,7 @@ u64 process_exec( process *current_process, u32 code_limit, u32 data_limit,
                 virt_to_phys_read( current_process->_code_address );
             if ( !code_trans )
             {
-                //page_fault code
+                page_fault( current_process -> _data_address, current_process );
                 return time_get(  );
             }
         } else if ( current_process->_data_time > time_till_timer )
@@ -283,7 +283,7 @@ u64 process_exec( process *current_process, u32 code_limit, u32 data_limit,
                         _data_address );
             if ( !data_trans )
             {
-                //page_fault code
+                page_fault( current_process -> _data_address, current_process );
                 return time_get(  );
             }
         }

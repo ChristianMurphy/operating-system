@@ -102,6 +102,22 @@ u16 walk_page_ring(  )
     return counter;
 }
 
+void page_fault( u32 address, process *faulting_process)
+{
+    printf("process PID #%d at address %d\n", faulting_process->_process_id, address);
+    u16 allocate = page_alloc();
+
+    if (!allocate)
+    {
+        u16 page_swap =  walk_page_ring();
+        page_free(page_swap);
+        allocate = page_alloc();
+    }
+
+    u16 disk_time = disk_read(address, allocate);
+    blocked_enq(faulting_process, disk_time);
+}
+
 u32 virtual_address_to_physical_address( u32 *address, process *current_process )
 {
     //get top ten bits
