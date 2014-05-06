@@ -24,23 +24,16 @@ static u64 vas_vec[VAS_VEC_SIZE] = { 0 };
 static u32 vas_offset = 0;
 static u32 vas_count = VAS_VEC_SIZE;
 
+// printf is more effictive
 void read_page_from_memory( u16 y )
 {
     printf("Reading from memory page %d\n", y);
-    /*
-    for ( u32 i = 0; i < 512; ++i )
-        x->_u64[i] = mem[y]._u64[i];
-    */
 }
 
-// may need to set dirty bit
+// original code was trash
 void write_page_to_memory( u16 y )
 {
     printf("Writing to memory page %d\n", y);
-    /*
-    for ( u32 i = 0; i < 512; ++i )
-        mem[y]._u64[i] = x->_u64[i];
-    */
 }
 
 u16 page_alloc(  )
