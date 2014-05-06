@@ -38,3 +38,4 @@ void ready_enq( process * p, s32 priority_delta );
 process *ready_deq( u8 priority );
 u64 time_get(  );
 void time_adv( u32 delta );
+void process_exec( process *current_process, u32 code_limit, u32 data_limit, u32 t );

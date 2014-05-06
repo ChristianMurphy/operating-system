@@ -220,71 +220,72 @@ u64 new_data_time(  )
     return 100 + ( rand(  ) & 0x1fff );
 }
 
-u64 process_exec( process *current_process, u32 code_limit, u32 data_limit,
+void process_exec( process *current_process, u32 code_limit, u32 data_limit,
           u32 t )
 {
-    u64 time = time_get(  );
+    u64 timer = current_process -> _time;
     u32 i;
 
-    u32 code_trans = virtual_address_to_physical_address( NULL, current_process );
-    u32 data_trans = virtual_address_to_physical_address( NULL, current_process );
+    u32 code_translation = virtual_address_to_physical_address( NULL, current_process );
+    u32 data_translation = virtual_address_to_physical_address( NULL, current_process );
 
-    if ( !code_trans )
+    if ( !code_translation )
     {
         page_fault( current_process -> _data_address, current_process );
     }
 
-    if ( !data_trans )
+    if ( !data_translation )
     {
         page_fault( current_process -> _data_address, current_process );
     }
 
-    while ( 1 )
+    while ( timer )
     {
-        u32 time_till_timer = t - time_get(  );
         if ( current_process->_code_time < current_process->_data_time )
         {
-            if ( current_process->_code_time > time_till_timer )
+            if ( current_process->_code_time > timer )
             {
-                current_process->_code_time -= time_till_timer;
-                current_process->_data_time -= time_till_timer;
-                return t;
+                printf("process PID #%d timed out\n", current_process -> _process_id);
+                current_process->_code_time -= timer;
+                time_adv(timer);
+                ready_enq(current_process, current_process -> _priority);
+                timer = 0;
             }
-            time_adv( current_process->_code_time );
-            current_process->_data_time -=
-                current_process->_code_time;
-            current_process->_code_address =
-                new_code_addr( current_process->_code_address,
-                       code_limit );
-            current_process->_code_time = new_code_time(  );
-            code_trans =
-                virt_to_phys_read( current_process->_code_address );
-            if ( !code_trans )
+
+            else
+            {
+                time_adv(current_process -> _code_time);
+                timer -= current_process -> _code_time;
+                ready_enq (current_process, current_process -> _priority);
+            }
+
+            if ( !code_translation )
             {
                 page_fault( current_process -> _data_address, current_process );
-                return time_get(  );
             }
-        } else if ( current_process->_data_time > time_till_timer )
+        }
+
+        else
         {
-            current_process->_code_time -= time_till_timer;
-            current_process->_data_time -= time_till_timer;
-            return t;
-        } else
-        {
-            time_adv( current_process->_data_time );
-            current_process->_code_time -=
-                current_process->_data_time;
-            current_process->_data_address =
-                new_data_addr( current_process->_data_address,
-                       code_limit, data_limit );
-            current_process->_data_time = new_data_time(  );
-            data_trans =
-                virt_to_phys_write( current_process->
-                        _data_address );
-            if ( !data_trans )
+            if (current_process->_data_time > timer)
+            {
+                printf("process PID #%d timed out\n", current_process -> _process_id);
+                current_process->_data_time -= timer;
+                time_adv(timer);
+                ready_enq(current_process, current_process -> _priority);
+                timer = 0;
+            }
+
+            else
+            {
+                time_adv(current_process -> _data_time);
+                timer -= current_process -> _data_time;
+                ready_enq (current_process, current_process -> _priority);
+            }
+
+            if ( !data_translation )
             {
                 page_fault( current_process -> _data_address, current_process );
-                return time_get(  );
             }
         }
     }
