@@ -27,13 +27,13 @@ static u32 vas_count = VAS_VEC_SIZE;
 // printf is more effictive
 void read_page_from_memory( u16 address )
 {
-    printf("Reading from memory page %d\n", y);
+    printf("Reading from memory page %d\n", address);
 }
 
 // original code was trash
 void write_page_to_memory( u16 address )
 {
-    printf("Writing to memory page %d\n", y);
+    printf("Writing to memory page %d\n", address);
 }
 
 u16 page_alloc(  )
