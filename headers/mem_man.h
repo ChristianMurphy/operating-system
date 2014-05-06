@@ -26,4 +26,4 @@ u16 page_alloc(  );
 void page_free( u16 x );
 int vas_alloc( u16 v[], u32 size );
 void vas_free( u16 v[], u32 size );
-u32 virtual_address_to_physical_address(u32 address, process *current_process);
+u32 virtual_address_to_physical_address(u32 *address, process *current_process);
