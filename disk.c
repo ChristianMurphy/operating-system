@@ -66,7 +66,7 @@ u64 disk_read( u32 block, u16 addr )
         disk_time += read_latency - ( delta & 0x1FFFFF );
     if ( block < SWAP_SIZE )
     {
-        read_page( block, addr );
+        write_page_to_memory( addr );
     }
     return disk_time;
 }
@@ -82,7 +82,7 @@ u64 disk_write( u32 block, u16 addr )
         disk_time += write_latency - ( delta & 0x1FFFFF );
     if ( block < SWAP_SIZE )
     {
-        write_page( block, addr );
+        read_page_from_memory( addr );
     }
     return disk_time;
 }

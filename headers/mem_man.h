@@ -19,8 +19,8 @@ typedef
     u64 _proc:16;       //proceedure number
 } mem_manage;
 
-void read_page( page * x, u16 y );
-void write_page( page * x, u16 y );
+void read_page_from_memory( u16 y );
+void write_page_to_memory( u16 y );
 void build_mem_avail(  );
 u16 page_alloc(  );
 void page_free( u16 x );
