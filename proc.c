@@ -44,7 +44,7 @@ void initiate_queues(  )
 
 void initiate_process( u8 priority, u32 code_size, u32 data_size, u64 time )
 {
-    process *new_process = malloc(sizeof(*new_process));
+    process *new_process = malloc( sizeof( *new_process ) );
     new_process->_virtual_address_space = code_size + data_size;
     new_process->_priority = priority;
     new_process->_time = time;
@@ -57,7 +57,7 @@ void initiate_process( u8 priority, u32 code_size, u32 data_size, u64 time )
 
 void blocked_enq( process * p, u64 time_process )
 {
-    printf("Process PID #%d is now blocked\n", p -> _process_id);
+    printf( "Process PID #%d is now blocked\n", p->_process_id );
     // adding a process to the blocked list
     p->_next = blocked._head;
     blocked._head = p;
@@ -75,7 +75,8 @@ process *blocked_deq(  )
         ready_enq( current_process->_next,
                current_process->_next->_priority );
         current_process->_next = NULL;
-        printf("Process PID #%d is no longer blocked\n", current_process -> _process_id);
+        printf( "Process PID #%d is no longer blocked\n",
+            current_process->_process_id );
         return current_process;
     }
 
@@ -95,13 +96,14 @@ process *blocked_deq(  )
         }
     }
 
-    printf("Process PID #%d is no longer blocked\n", current_process -> _process_id);
+    printf( "Process PID #%d is no longer blocked\n",
+        current_process->_process_id );
     return current_process;
 }
 
 void ready_enq( process * p, s32 priority_delta )
 {
-    printf("Process PID #%d is now ready\n", p -> _process_id);
+    printf( "Process PID #%d is now ready\n", p->_process_id );
     //get the current queue
     ready_queue current_priority_queue;
     switch ( p->_priority )
@@ -182,7 +184,8 @@ process *ready_deq( u8 priority )
         break;
     }
 
-    printf("Process PID #%d is no longer ready\n", temporary_process._process_id);
+    printf( "Process PID #%d is no longer ready\n",
+        temporary_process._process_id );
     return &temporary_process;
 }
 
@@ -220,23 +223,25 @@ u64 new_data_time(  )
     return 100 + ( rand(  ) & 0x1fff );
 }
 
-void process_exec( process *current_process, u32 code_limit, u32 data_limit,
-          u32 t )
+void process_exec( process * current_process, u32 code_limit, u32 data_limit,
+           u32 t )
 {
-    u64 timer = current_process -> _time;
+    u64 timer = current_process->_time;
     u32 i;
 
-    u32 code_translation = virtual_address_to_physical_address( NULL, current_process );
-    u32 data_translation = virtual_address_to_physical_address( NULL, current_process );
+    u32 code_translation =
+        virtual_address_to_physical_address( NULL, current_process );
+    u32 data_translation =
+        virtual_address_to_physical_address( NULL, current_process );
 
     if ( !code_translation )
     {
-        page_fault( current_process -> _data_address, current_process );
+        page_fault( current_process->_data_address, current_process );
     }
 
     if ( !data_translation )
     {
-        page_fault( current_process -> _data_address, current_process );
+        page_fault( current_process->_data_address, current_process );
     }
 
     while ( timer )
@@ -245,47 +250,55 @@ void process_exec( process *current_process, u32 code_limit, u32 data_limit,
         {
             if ( current_process->_code_time > timer )
             {
-                printf("process PID #%d timed out\n", current_process -> _process_id);
+                printf( "process PID #%d timed out\n",
+                    current_process->_process_id );
                 current_process->_code_time -= timer;
-                time_adv(timer);
-                ready_enq(current_process, current_process -> _priority);
+                time_adv( timer );
+                ready_enq( current_process,
+                       current_process->_priority );
                 timer = 0;
             }
 
             else
             {
-                time_adv(current_process -> _code_time);
-                timer -= current_process -> _code_time;
-                ready_enq (current_process, current_process -> _priority);
+                time_adv( current_process->_code_time );
+                timer -= current_process->_code_time;
+                ready_enq( current_process,
+                       current_process->_priority );
             }
 
             if ( !code_translation )
             {
-                page_fault( current_process -> _data_address, current_process );
+                page_fault( current_process->_data_address,
+                        current_process );
             }
         }
 
         else
         {
-            if (current_process->_data_time > timer)
+            if ( current_process->_data_time > timer )
             {
-                printf("process PID #%d timed out\n", current_process -> _process_id);
+                printf( "process PID #%d timed out\n",
+                    current_process->_process_id );
                 current_process->_data_time -= timer;
-                time_adv(timer);
-                ready_enq(current_process, current_process -> _priority);
+                time_adv( timer );
+                ready_enq( current_process,
+                       current_process->_priority );
                 timer = 0;
             }
 
             else
             {
-                time_adv(current_process -> _data_time);
-                timer -= current_process -> _data_time;
-                ready_enq (current_process, current_process -> _priority);
+                time_adv( current_process->_data_time );
+                timer -= current_process->_data_time;
+                ready_enq( current_process,
+                       current_process->_priority );
             }
 
             if ( !data_translation )
             {
-                page_fault( current_process -> _data_address, current_process );
+                page_fault( current_process->_data_address,
+                        current_process );
             }
         }
     }

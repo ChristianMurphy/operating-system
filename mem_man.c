@@ -27,13 +27,13 @@ static u32 vas_count = VAS_VEC_SIZE;
 // printf is more effictive
 void read_page_from_memory( u16 address )
 {
-    printf("Reading from memory page %d\n", address);
+    printf( "Reading from memory page %d\n", address );
 }
 
 // original code was trash
 void write_page_to_memory( u16 address )
 {
-    printf("Writing to memory page %d\n", address);
+    printf( "Writing to memory page %d\n", address );
 }
 
 u16 page_alloc(  )
@@ -102,29 +102,31 @@ u16 walk_page_ring(  )
     return counter;
 }
 
-void page_fault( u32 address, process *faulting_process)
+void page_fault( u32 address, process * faulting_process )
 {
-    printf("process PID #%d at address %d\n", faulting_process->_process_id, address);
-    u16 allocate = page_alloc();
+    printf( "process PID #%d at address %d\n",
+        faulting_process->_process_id, address );
+    u16 allocate = page_alloc(  );
 
-    if (!allocate)
+    if ( !allocate )
     {
-        u16 page_swap =  walk_page_ring();
-        page_free(page_swap);
-        allocate = page_alloc();
+        u16 page_swap = walk_page_ring(  );
+        page_free( page_swap );
+        allocate = page_alloc(  );
     }
 
-    u16 disk_time = disk_read(address, allocate);
-    blocked_enq(faulting_process, disk_time);
+    u16 disk_time = disk_read( address, allocate );
+    blocked_enq( faulting_process, disk_time );
 }
 
-u32 virtual_address_to_physical_address( u32 *address, process *current_process )
+u32 virtual_address_to_physical_address( u32 * address,
+                     process * current_process )
 {
     //get top ten bits
     u32 level_one_index = *address >> 22;
-    u32 level_two_index = ((*address >> 12) & 0x3FF);
+    u32 level_two_index = ( ( *address >> 12 ) & 0x3FF );
 
-    u16 level_one_address = current_process -> _process_id;
+    u16 level_one_address = current_process->_process_id;
     page level_one = mem[level_one_index];
     u32 level_two_address = level_one._u32[level_one_index];
 

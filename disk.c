@@ -58,7 +58,7 @@ void swap_free( u16 v[], u32 size )
 
 u64 disk_read( u32 block, u16 addr )
 {
-    printf("reading block %d from disk at address %d\n", block, addr);
+    printf( "reading block %d from disk at address %d\n", block, addr );
     u32 delta = rand(  );
     if ( time_get(  ) > disk_time )
         disk_time = time_get(  );
@@ -75,7 +75,7 @@ u64 disk_read( u32 block, u16 addr )
 
 u64 disk_write( u32 block, u16 addr )
 {
-    printf("writing block %d to disk at address %d\n", block, addr);
+    printf( "writing block %d to disk at address %d\n", block, addr );
     u32 delta = rand(  );
     if ( time_get(  ) > disk_time )
         disk_time = time_get(  );
