@@ -238,5 +238,5 @@ int main(  )
 		scheduler(  );
 	}
 	while ( ( counter < 100 ) || ( empty_queues(  ) == 0 ) );
-	printf( "All processes finished\n" );
+	printf( "program complete\n" );
 }

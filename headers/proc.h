@@ -1,5 +1,4 @@
-#ifndef _PROC__H_
-#    define _PROC__H_
+# pragma once
 
 #    include "types.h"
 
@@ -57,5 +56,3 @@ u32 new_code_address( u32 address, u32 limit );
 u64 new_code_time(  );
 u32 new_data_address( u32 address, u32 base, u32 limit );
 u64 new_data_time(  );
-
-#endif

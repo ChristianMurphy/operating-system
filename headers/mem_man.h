@@ -1,19 +1,18 @@
-#ifndef	_MEM_MAN__H_
-#    define	_MEM_MAN__H_
+# pragma once
 
 #    include "types.h"
 #    include "proc.h"
 
 typedef struct {
-	u64 _used:1;		
-	u64 _dirty:1;		
-	u64 _pinned:1;		
-	 u64:13;		
-	u64 _level_one_i:10;		
-	 u64:6;			
-	u64 _level_twoi:10;		
-	 u64:6;			
-	u64 _proc:16;		
+	u64 _used:1;
+	u64 _dirty:1;
+	u64 _pinned:1;
+	 u64:13;
+	u64 _level_one_i:10;
+	 u64:6;
+	u64 _level_twoi:10;
+	 u64:6;
+	u64 _proc:16;
 } memory_manage_structure;
 
 void read_page( u16 page_number );
@@ -38,5 +37,3 @@ u32 virtual_to_physical( u32 address, proc current_process );
 void page_fault( u32 address, proc current_process );
 
 u16 walk_page_ring(  );
-
-#endif

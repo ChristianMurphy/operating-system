@@ -1,5 +1,4 @@
-#ifndef _TYPES__H_
-#    define _TYPES__H_
+# pragma once
 
 #    define	CASE	break; case
 
@@ -37,5 +36,3 @@ typedef enum {
     Keyboard,
     Timer
 } dev_type;
-
-#endif

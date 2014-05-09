@@ -1,170 +1,126 @@
 #include	<stdio.h>
 #include	"headers/types.h"
 
-u32 least_significant_bit8( u8 x )
+u32 least_significant_bit8( u8 number )
 {
-	u32 pos = 0;
+	u32 position = 0;
 
-	if ( !( ~x & 15 ) )
+	if ( !( ~number & 15 ) )
 	{
-		pos += 4;
-		x >>= 4;
+		position += 4;
+		number >>= 4;
 	}
-	if ( !( ~x & 3 ) )
+	if ( !( ~number & 3 ) )
 	{
-		pos += 2;
-		x >>= 2;
+		position += 2;
+		number >>= 2;
 	}
-	if ( !( ~x & 1 ) )
+	if ( !( ~number & 1 ) )
 	{
-		pos += 1;
-		x >>= 1;
+		position += 1;
+		number >>= 1;
 	}
 
-/*
-	u32	index;
-
-	for (index = 4; index > 0; index >>= 1) {
-		if (!(~x & ((1 << index) - 1))) {
-			pos  += index;
-			x	>>= index;
-		}
-	}
-*/
-
-	return pos;
+	return position;
 }
 
-u32 least_significant_bit16( u16 x )
+u32 least_significant_bit16( u16 number )
 {
-	u32 pos = 0;
+	u32 position = 0;
 
-	if ( !( ~x & 255 ) )
+	if ( !( ~number & 255 ) )
 	{
-		pos += 8;
-		x >>= 8;
+		position += 8;
+		number >>= 8;
 	}
-	if ( !( ~x & 15 ) )
+	if ( !( ~number & 15 ) )
 	{
-		pos += 4;
-		x >>= 4;
+		position += 4;
+		number >>= 4;
 	}
-	if ( !( ~x & 3 ) )
+	if ( !( ~number & 3 ) )
 	{
-		pos += 2;
-		x >>= 2;
+		position += 2;
+		number >>= 2;
 	}
-	if ( !( ~x & 1 ) )
+	if ( !( ~number & 1 ) )
 	{
-		pos += 1;
-		x >>= 1;
+		position += 1;
+		number >>= 1;
 	}
 
-/*
-	u32	index;
-
-	for (index = 5; index > 0; index >>= 1) {
-		if (!(~x & ((1 << index) - 1))) {
-			pos  += index;
-			x	>>= index;
-		}
-	}
-*/
-
-	return pos;
+	return position;
 }
 
-u32 least_significant_bit32( u32 x )
+u32 least_significant_bit32( u32 number )
 {
-	u32 pos = 0;
+	u32 position = 0;
 
-	if ( !( ~x & 0xFFFF ) )
+	if ( !( ~number & 0xFFFF ) )
 	{
-		pos += 16;
-		x >>= 16;
+		position += 16;
+		number >>= 16;
 	}
-	if ( !( ~x & 0x00FF ) )
+	if ( !( ~number & 0x00FF ) )
 	{
-		pos += 8;
-		x >>= 8;
+		position += 8;
+		number >>= 8;
 	}
-	if ( !( ~x & 0x000F ) )
+	if ( !( ~number & 0x000F ) )
 	{
-		pos += 4;
-		x >>= 4;
+		position += 4;
+		number >>= 4;
 	}
-	if ( !( ~x & 0x0003 ) )
+	if ( !( ~number & 0x0003 ) )
 	{
-		pos += 2;
-		x >>= 2;
+		position += 2;
+		number >>= 2;
 	}
-	if ( !( ~x & 0x0001 ) )
+	if ( !( ~number & 0x0001 ) )
 	{
-		pos += 1;
-		x >>= 1;
+		position += 1;
+		number >>= 1;
 	}
 
-/*
-	u32	index;
-
-	for (index = 6; index > 0; index >>= 1) {
-		if (!(~x & ((1 << index) - 1))) {
-			pos  += index;
-			x	>>= index;
-		}
-	}
-*/
-
-	return pos;
+	return position;
 }
 
-u32 least_significant_bit64( u64 x )
+u32 least_significant_bit64( u64 number )
 {
-	u32 pos = 0;
+	u32 position = 0;
 
-	if ( !( ~x & 0xFFFFFFFF ) )
+	if ( !( ~number & 0xFFFFFFFF ) )
 	{
-		pos += 32;
-		x >>= 32;
+		position += 32;
+		number >>= 32;
 	}
-	if ( !( ~x & 0x0000FFFF ) )
+	if ( !( ~number & 0x0000FFFF ) )
 	{
-		pos += 16;
-		x >>= 16;
+		position += 16;
+		number >>= 16;
 	}
-	if ( !( ~x & 0x000000FF ) )
+	if ( !( ~number & 0x000000FF ) )
 	{
-		pos += 8;
-		x >>= 8;
+		position += 8;
+		number >>= 8;
 	}
-	if ( !( ~x & 0x0000000F ) )
+	if ( !( ~number & 0x0000000F ) )
 	{
-		pos += 4;
-		x >>= 4;
+		position += 4;
+		number >>= 4;
 	}
-	if ( !( ~x & 0x00000003 ) )
+	if ( !( ~number & 0x00000003 ) )
 	{
-		pos += 2;
-		x >>= 2;
+		position += 2;
+		number >>= 2;
 	}
-	if ( !( ~x & 0x00000001 ) )
+	if ( !( ~number & 0x00000001 ) )
 	{
-		pos += 1;
-		x >>= 1;
+		position += 1;
+		number >>= 1;
 	}
 
-/*
-	u32	index;
-
-	for (index = 7; index > 0; index >>= 1) {
-		if (!(~x & ((1l << index) - 1))) {
-			pos  += index;
-			x	>>= index;
-		}
-	}
-*/
-
-	return pos;
+	return position;
 }
 
 #ifdef	_UTL_TEST_
@@ -172,14 +128,14 @@ u32 least_significant_bit64( u64 x )
 int main(  )
 {
 	int index;
-	int x;
+	int number;
 	int page_number;
 	int z;
 
 	for ( index = 0; index < 256; ++index )
 	{
-		x = least_significant_bit8( index );
-		printf( "least_significant_bit8(index) = %02x\n", x );
+		number = least_significant_bit8( index );
+		printf( "least_significant_bit8(index) = %02x\n", number );
 	}
 
 }
