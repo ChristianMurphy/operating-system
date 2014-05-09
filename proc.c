@@ -6,7 +6,6 @@
 #include "headers/mem_man.h"
 #include "headers/proc.h"
 
-// Create all of the queues
 static blocked _blocked;
 static ready _high;
 static ready _medium;
@@ -18,7 +17,7 @@ static u64 time_blocked = 0;
 static u16 number_of_processes = 1;
 static u16 completed_processes = 0;
 
-// initial addressess, process time, time prediction, priority, and something else
+
 
 void blocked_enqueue( proc current_process, u64 estimated_time )
 {
@@ -49,7 +48,7 @@ void blocked_dequeue(  )
 	{
 		if ( cp->_blocked_timer <= time_get(  ) )
 		{
-			printf( "Removing process %d from the blocked queue\n",
+			printf( "process %d unblocked\n",
 				_blocked._head->_process_identity );
 			ready_enqueue( _blocked._head );
 			_blocked._head = NULL;
@@ -68,7 +67,7 @@ void blocked_dequeue(  )
 					_blocked._head = cp->_next;
 					cp->_next = NULL;
 					printf
-					    ( "Removing process %d from the blocked queue\n",
+					    ( "process %d unblocked\n",
 					      cp->_process_identity );
 					ready_enqueue( cp );
 					cp = _blocked._head;
@@ -78,7 +77,7 @@ void blocked_dequeue(  )
 					pp->_next = cp->_next;
 					cp->_next = NULL;
 					printf
-					    ( "Removing process %d from the blocked queue\n",
+					    ( "process %d unblocked\n",
 					      cp->_process_identity );
 					ready_enqueue( cp );
 					cp = pp->_next;
@@ -119,7 +118,7 @@ void ready_enqueue( proc current_process )
 				_high._tail = current_process;
 			}
 			printf
-			    ( "Placing process %d in the high priority queue\n",
+			    ( "process %d is ready [high priority]\n",
 			      current_process->_process_identity );
 		}
 
@@ -137,7 +136,7 @@ void ready_enqueue( proc current_process )
 				_medium._tail = current_process;
 			}
 			printf
-			    ( "Placing process %d in the medium priority queue\n",
+			    ( "process %d is ready [medium priotiy]\n",
 			      current_process->_process_identity );
 		}
 
@@ -155,13 +154,13 @@ void ready_enqueue( proc current_process )
 				_low._tail = current_process;
 			}
 			printf
-			    ( "Placing process %d in the low priority queue\n",
+			    ( "process %d is ready [low priority]\n",
 			      current_process->_process_identity );
 		}
 	}
 }
 
-proc ready_deq( u8 priority )
+proc ready_dequeue( u8 priority )
 {
 	proc current_process;
 
@@ -233,7 +232,7 @@ proc ready_deq( u8 priority )
 	return current_process;
 }
 
-//
+
 u32 new_code_address( u32 address, u32 limit )
 {
 	static u32 x[32] = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
@@ -245,13 +244,13 @@ u32 new_code_address( u32 address, u32 limit )
 	return ( address > limit ) ? address = r % limit : address;
 }
 
-//
+
 u64 new_code_time(  )
 {
 	return 50 + ( rand(  ) & 0xfff );
 }
 
-//
+
 u32 new_data_address( u32 address, u32 base, u32 limit )
 {
 	static u32 x[32] = { 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4,
@@ -265,13 +264,13 @@ u32 new_data_address( u32 address, u32 base, u32 limit )
 	    base + ( r % ( limit - base ) ) : address;
 }
 
-//
+
 u64 new_data_time(  )
 {
 	return 100 + ( rand(  ) & 0x1fff );
 }
 
-//
+
 u64 time_get(  )
 {
 	return time;
@@ -287,8 +286,8 @@ u16 get_finished(  )
 	return completed_processes;
 }
 
-//
-void process_exec( proc current_process )
+
+void process_execute( proc current_process )
 {
 
 	if ( current_process->_run_counter < 1 )
@@ -302,9 +301,9 @@ void process_exec( proc current_process )
 			unset_pinned_bit( level_two );
 		}
 		unset_pinned_bit( current_process->_pti );
-		printf( "Process %d has finished executing\n", current_process->_process_identity );
+		printf( "process %d has completed\n", current_process->_process_identity );
 		completed_processes++;
-		printf( "%d processes have finished executing\n",
+		printf( "%d total processes have completed\n",
 			get_finished(  ) );
 		return;
 	}
@@ -378,7 +377,7 @@ void process_exec( proc current_process )
 		{
 			if ( current_process->_data_time > timer )
 			{
-				printf( "Process %d ran out of time\n",
+				printf( "process %d timed out\n",
 					current_process->_process_identity );
 
 				current_process->_data_time -= timer;
@@ -405,7 +404,7 @@ void process_exec( proc current_process )
 
 			if ( !code_translation )
 			{
-				printf( "page fault for code\n" );
+				printf( "page fault for code page\n" );
 				page_fault( current_process->_data_address, current_process );
 				return;
 			}
@@ -415,7 +414,7 @@ void process_exec( proc current_process )
 	}
 }
 
-// Initialize values in the queues
+
 void initialize_queues(  )
 {
 	_blocked._head = NULL;
@@ -430,7 +429,7 @@ void initialize_queues(  )
 	_low._tail = NULL;
 }
 
-// Initializes a process
+
 int initialize_process( u8 priority, u32 csize, u32 dsize, u64 t )
 {
 	proc np = malloc( sizeof( *np ) );
@@ -507,49 +506,30 @@ u8 empty_queues(  )
 	return x;
 }
 
-// Checks ready queues first, 4 from high, 2 from medium, 1 from low
-// Then looks through blocked to see if anything is finished
+
+
 void scheduler(  )
 {
-	proc gp;
+	proc global_process;
 	time_advance( 10000 );
 	blocked_dequeue(  );
 
-	switch ( counter )
-	{
-	case 0:
-	case 1:
-	case 2:
-	case 3:
-		if ( ( gp = ready_deq( 1 ) ) != NULL )
-		{
-			break;
-		}
+    if (counter < 4)
+    {
+        global_process = ready_dequeue( 1 );
+    }
+    else if (counter < 7)
+    {
+        global_process = ready_dequeue( 2 );
+    }
+    else
+    {
+        global_process = ready_dequeue( 3 );
+    }
 
-	case 4:
-	case 5:
-	case 6:
-		if ( ( gp = ready_deq( 2 ) ) != NULL )
-		{
-			break;
-		}
-
-	case 7:
-		if ( ( gp = ready_deq( 3 ) ) != NULL )
-		{
-			break;
-		}
-	default:
-		if ( gp == NULL && counter > 3 )
-		{
-			gp = ready_deq( 1 );
-		}
-		break;
-	}
-
-	if ( gp != NULL )
+	if ( global_process != NULL )
 	{
 		counter = counter++ % 7;
-		process_exec( gp );
+		process_execute( global_process );
 	}
 }

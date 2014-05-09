@@ -9,18 +9,18 @@
 #define	virtual_address_space_vector_SIZE (1 << 6)
 #define	virtual_address_space_vector_SIZE_MASK (virtual_address_space_vector_SIZE - 1)
 
-// all of the pages
+
 static page page_memory[PAGE_COUNT];
 
-// first available page
+
 static u16 page_availible = 1;
 
-// meta data for the memory
+
 static memory_manage_structure memory_manager[PAGE_COUNT] = { 0 };
 
 static u16 memory_offset = 1;
 
-// this is a 2^6 by 2^6 memory space that represents a page table
+
 static u64 virtual_address_space_vector[virtual_address_space_vector_SIZE] = { 0 };
 
 static u32 virtual_address_space_offset = 0;
@@ -69,9 +69,9 @@ u16 address_get( u16 page_number, int index )
 	return b;
 }
 
-// Creates page at page_availible, if page_availible is not 0.
-// page_availible is set to the allocated pages _u16.
-// Return the addressess of the newly allocated page.
+
+
+
 u16 page_allocation(  )
 {
 	u16 t = page_availible;
@@ -87,9 +87,9 @@ u16 page_allocation(  )
 	return t;
 }
 
-// Frees page
-// Page x's _u16 is set to the current page_availible.
-// page_availible is then set to the addressess of the new page.
+
+
+
 void page_free( u16 page_index )
 {
 	if ( memory_manager[page_index]._dirty )
@@ -111,7 +111,7 @@ void page_free_all(  )
 	}
 }
 
-//
+
 u32 virtual_to_physical( u32 address, proc current_process )
 {
 	u32 level_one_index = address >> 22;
@@ -136,7 +136,7 @@ u32 virtual_to_physical( u32 address, proc current_process )
 	return physical_address;
 }
 
-//
+
 void page_fault( u32 address, proc current_process )
 {
 	printf( "Process %d faulted on addressess %d\n", current_process->_process_identity, address );
@@ -164,7 +164,7 @@ void page_fault( u32 address, proc current_process )
 	blocked_enqueue( current_process, d_time );
 }
 
-// Array is the sbt from proc(index believe), size is the number of chunks a process wants.
+
 int virtual_address_space_allocation( u16 virtual_space[], u32 size )
 {
 	int result = 0;
@@ -183,37 +183,37 @@ int virtual_address_space_allocation( u16 virtual_space[], u32 size )
 				}
 			}
 
-			// Find a free chunk and record its position
+			
 			u16 bit_position = ( u16 ) least_significant_bit64( virtual_address_space_vector[virtual_address_space_offset] );
-			// Create an addressess of the chunk level index and position
+			
 			u16 chunk_addressess = ( virtual_address_space_offset << 8 ) | ( bit_position );
-			// Store addressess in the passed in array
+			
 			virtual_space[index] = chunk_addressess;
 
 			u64 flipped_bit = 1;
 			flipped_bit = flipped_bit << bit_position;
 
-			// Flip the bit at virtual_address_space_offset and bit_positiont to indicate allocated memory
+			
 			virtual_address_space_vector[virtual_address_space_offset] =
 			    virtual_address_space_vector[virtual_address_space_offset] | ( flipped_bit );
 
-			// If the row is completely allocated
+			
 			virtual_address_space_count--;
 		}
 
 		result = 1;
 	}
-	// result: 0 is failure, 1 is success
+	
 	return result;
 }
 
-// Array is the sbt from proc(index believe), size is the number of chunks a process wants.
+
 void vas_free( u16 virtual_space[], u32 size )
 {
 	int index;
 	for ( index = 0; index < size; index++ )
 	{
-		// Get an addressess of a chunk to be free
+		
 		u16 chunk_addressess = virtual_space[index];
 		u16 bit_position = chunk_addressess & 0x00FF;
 		u16 virtual_address_space_offset_temparary = chunk_addressess >> 8;
@@ -227,8 +227,8 @@ void vas_free( u16 virtual_space[], u32 size )
 	}
 }
 
-// Iterate through memory and do stuff:
-// Set used to 0 for each page.
+
+
 u16 walk_page_ring(  )
 {
 	u16 temparary = 0;
