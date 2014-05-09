@@ -287,16 +287,16 @@ void process_execute( proc current_process )
 
 	if ( current_process->_run_counter < 1 )
 	{
-		vas_free( current_process->_sbt, current_process->_vas );
+		vas_free( current_process->_sbt, current_process->_virtual_address_space );
 
 		int index;
-		for ( index = 0; index < current_process->_vas; index++ )
+		for ( index = 0; index < current_process->_virtual_address_space; index++ )
 		{
 			u16 level_two =
-			    address_get( current_process->_pti, index );
+			    address_get( current_process->_page_table_index, index );
 			unset_pinned_bit( level_two );
 		}
-		unset_pinned_bit( current_process->_pti );
+		unset_pinned_bit( current_process->_page_table_index );
 		printf( "process %d has completed\n",
 			current_process->_process_identity );
 		completed_processes++;
@@ -444,33 +444,33 @@ void initialize_queues(  )
 	_high._tail = NULL;
 }
 
-int initialize_process( u8 priority, u32 csize, u32 dsize, u64 t )
+int initialize_process( u8 priority, u32 code_size, u32 data_size, u64 t )
 {
-	proc np = malloc( sizeof( *np ) );
+	proc new_process = malloc( sizeof( *new_process ) );
 
-	np->_vas = ( ( ( ( csize + dsize ) / 1000 ) / 1000 ) / 4 );
+	new_process->_virtual_address_space = ( ( ( ( code_size + data_size ) / 1000 ) / 1000 ) / 4 );
 
 	int enough_space =
-	    virtual_address_space_allocation( np->_sbt, np->_vas );
+	    virtual_address_space_allocation( new_process->_sbt, new_process->_virtual_address_space );
 
 	if ( enough_space )
 	{
-		np->_process_identity = number_of_processes;
+		new_process->_process_identity = number_of_processes;
 		number_of_processes++;
 
-		np->_priority = priority;
-		np->_time = t;
+		new_process->_priority = priority;
+		new_process->_time = t;
 
-		np->_code_address = 0;
-		np->_code_time = new_code_time(  );
-		np->_code_size = csize;
+		new_process->_code_address = 0;
+		new_process->_code_time = new_code_time(  );
+		new_process->_code_size = code_size;
 
-		np->_data_address = csize + 1;
-		np->_data_time = new_data_time(  );
-		np->_data_size = dsize;
+		new_process->_data_address = code_size + 1;
+		new_process->_data_time = new_data_time(  );
+		new_process->_data_size = data_size;
 
-		np->_run_counter = 5;
-		np->_next = NULL;
+		new_process->_run_counter = 5;
+		new_process->_next = NULL;
 
 		u16 allocation = page_allocation(  );
 
@@ -482,11 +482,11 @@ int initialize_process( u8 priority, u32 csize, u32 dsize, u64 t )
 			allocation = page_allocation(  );
 		}
 
-		np->_pti = allocation;
+		new_process->_page_table_index = allocation;
 		set_pinned_bit( allocation );
 
 		int index;
-		for ( index = 0; index < np->_vas; index++ )
+		for ( index = 0; index < new_process->_virtual_address_space; index++ )
 		{
 			u16 allocation = page_allocation(  );
 
@@ -497,29 +497,29 @@ int initialize_process( u8 priority, u32 csize, u32 dsize, u64 t )
 				allocation = page_allocation(  );
 			}
 
-			address_set( np->_pti, index, allocation );
+			address_set( new_process->_page_table_index, index, allocation );
 			set_pinned_bit( allocation );
 		}
 
 		printf( "Creating new process, id: %d\n",
-			np->_process_identity );
-		ready_enqueue( np );
+			new_process->_process_identity );
+		ready_enqueue( new_process );
 		return 1;
 	} else
 	{
-		free( np );
+		free( new_process );
 		return 0;
 	}
 }
 
 u8 empty_queues(  )
 {
-	u8 b = ( _blocked._head == NULL );
-	u8 h = ( _high._head == NULL );
-	u8 m = ( _medium._head == NULL );
-	u8 l = ( _low._head == NULL );
-	u8 x = ( b && h && m && l );
-	return x;
+	u8 blocked_empty = ( _blocked._head == NULL );
+	u8 high_empty = ( _high._head == NULL );
+	u8 medium_empty = ( _medium._head == NULL );
+	u8 low_empty = ( _low._head == NULL );
+	u8 all_empty = ( blocked_empty && high_empty && medium_empty && low_empty );
+	return all_empty;
 }
 
 void scheduler(  )

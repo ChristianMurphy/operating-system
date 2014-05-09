@@ -25,12 +25,12 @@ static u32 virtual_address_space_count = 4096;
 
 void read_page( u16 page_number )
 {
-	printf( "Page %d read\n", page_number );
+	printf( "page %d read\n", page_number );
 }
 
 void write_page( u16 page_number )
 {
-	printf( "Page %d write\n", page_number );
+	printf( "page %d write\n", page_number );
 }
 
 page get_page( u32 address )
@@ -108,7 +108,7 @@ u32 virtual_to_physical( u32 address, proc current_process )
 	u32 level_one_index = address >> 22;
 	u32 level_two_index = ( ( address >> 12 ) & 0x3FF );
 
-	u16 level_one_address = current_process->_pti;
+	u16 level_one_address = current_process->_page_table_index;
 	page level_one = page_memory[level_one_address];
 	u32 level_two_address = level_one._u32[level_one_index];
 
@@ -129,7 +129,7 @@ u32 virtual_to_physical( u32 address, proc current_process )
 
 void page_fault( u32 address, proc current_process )
 {
-	printf( "Process %d faulted on addressess %d\n",
+	printf( "process %d faulted on address %d\n",
 		current_process->_process_identity, address );
 
 	u16 allocation = page_allocation(  );
@@ -140,13 +140,13 @@ void page_fault( u32 address, proc current_process )
 		page_free( swap_page );
 		allocation = page_allocation(  );
 
-		printf( "must swap\n" );
+		printf( "swap page\n" );
 	}
-	printf( "Page %d found\n", allocation );
+	printf( "page %d taken\n", allocation );
 
 	u32 level_one_index = address >> 22;
 	u32 level_two_index = ( ( address >> 12 ) & 0x3FF );
-	u16 level_one_address = current_process->_pti;
+	u16 level_one_address = current_process->_page_table_index;
 	page level_one = page_memory[level_one_address];
 	u32 level_two_address = level_one._u32[level_one_index];
 

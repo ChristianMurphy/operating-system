@@ -7,7 +7,7 @@ typedef struct process *proc;
 struct process {
 	u16 _process_identity;
 
-	u32 _vas;
+	u32 _virtual_address_space;
 	u8 _priority;
 	u64 _time;
 
@@ -25,7 +25,7 @@ struct process {
 
 	proc _next;
 
-	u16 _pti;
+	u16 _page_table_index;
 	u16 _sbt[1024];
 } process;
 
@@ -49,7 +49,7 @@ void time_advance( u64 time_delta );
 u16 get_finished(  );
 
 void initialize_queues(  );
-int initialize_process( u8 current_process, u32 csize, u32 dsize, u64 t );
+int initialize_process( u8 current_process, u32 code_size, u32 data_size, u64 t );
 u8 empty_queues(  );
 
 u32 new_code_address( u32 address, u32 limit );
