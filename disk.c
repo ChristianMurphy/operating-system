@@ -14,7 +14,8 @@ static u32 read_latency = 8 << 20;
 static u32 write_latency = 8 << 20;
 static u64 disk_time = 0;
 
-int swap_alloc( u16 v[], u32 size )
+//allocates the swap space
+int swap_allocation( u16 v[], u32 size )
 {
 	u32 index;
 	u32 t;
@@ -38,6 +39,7 @@ int swap_alloc( u16 v[], u32 size )
 	return 1;
 }
 
+//frees swap space
 void swap_free( u16 v[], u32 size )
 {
 	u32 index;
@@ -47,6 +49,7 @@ void swap_free( u16 v[], u32 size )
 	count += size;
 }
 
+//reads from disk to memory
 u64 disk_read( u32 block, u16 address )
 {
 	printf( "Reading block %d from disk\n", block );
@@ -77,6 +80,7 @@ u64 disk_read( u32 block, u16 address )
 	return disk_time;
 }
 
+//reads from memory writes to disk
 u64 disk_write( u32 block, u16 address )
 {
 	u32 delta = rand(  );

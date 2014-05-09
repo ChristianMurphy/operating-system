@@ -15,23 +15,23 @@ static ready _low;
 static int counter = 0;
 static u64 time = 0;
 static u64 time_blocked = 0;
-static u16 num_proc = 1;
+static u16 number_of_processes = 1;
 static u16 finished = 0;
 
 // initial addressess, process time, time prediction, priority, and something else
 
-void blocked_enq( proc p, u64 estimated_time )
+void blocked_enqueue( proc current_process, u64 estimated_time )
 {
-	printf( "Placing process %d in the blocked queue\n", p->_process_identity );
+	printf( "Placing process %d in the blocked queue\n", current_process->_process_identity );
 
-	p->_blocked_timer = estimated_time;
+	current_process->_blocked_timer = estimated_time;
 	if ( _blocked._head == NULL )
 	{
-		_blocked._head = p;
+		_blocked._head = current_process;
 	} else
 	{
-		p->_next = _blocked._head;
-		_blocked._head = p;
+		current_process->_next = _blocked._head;
+		_blocked._head = current_process;
 	}
 }
 
@@ -51,7 +51,7 @@ void blocked_deq(  )
 		{
 			printf( "Removing process %d from the blocked queue\n",
 				_blocked._head->_process_identity );
-			ready_enq( _blocked._head );
+			ready_enqueue( _blocked._head );
 			_blocked._head = NULL;
 		}
 	}
@@ -70,7 +70,7 @@ void blocked_deq(  )
 					printf
 					    ( "Removing process %d from the blocked queue\n",
 					      cp->_process_identity );
-					ready_enq( cp );
+					ready_enqueue( cp );
 					cp = _blocked._head;
 					pp = cp;
 				} else
@@ -80,7 +80,7 @@ void blocked_deq(  )
 					printf
 					    ( "Removing process %d from the blocked queue\n",
 					      cp->_process_identity );
-					ready_enq( cp );
+					ready_enqueue( cp );
 					cp = pp->_next;
 				}
 			}
@@ -101,69 +101,69 @@ void blocked_deq(  )
 	}
 }
 
-void ready_enq( proc p )
+void ready_enqueue( proc current_process )
 {
-	if ( p->_priority )
+	if ( current_process->_priority )
 	{
-		if ( p->_priority == 1 )
+		if ( current_process->_priority == 1 )
 		{
 			if ( _high._head == NULL && _high._tail == NULL )
 			{
-				_high._head = p;
-				_high._tail = p;
+				_high._head = current_process;
+				_high._tail = current_process;
 			}
 
 			else
 			{
-				_high._tail->_next = p;
-				_high._tail = p;
+				_high._tail->_next = current_process;
+				_high._tail = current_process;
 			}
 			printf
 			    ( "Placing process %d in the high priority queue\n",
-			      p->_process_identity );
+			      current_process->_process_identity );
 		}
 
-		if ( p->_priority == 2 )
+		if ( current_process->_priority == 2 )
 		{
 			if ( _medium._head == NULL && _medium._tail == NULL )
 			{
-				_medium._head = p;
-				_medium._tail = p;
+				_medium._head = current_process;
+				_medium._tail = current_process;
 			}
 
 			else
 			{
-				_medium._tail->_next = p;
-				_medium._tail = p;
+				_medium._tail->_next = current_process;
+				_medium._tail = current_process;
 			}
 			printf
 			    ( "Placing process %d in the medium priority queue\n",
-			      p->_process_identity );
+			      current_process->_process_identity );
 		}
 
-		if ( p->_priority == 3 )
+		if ( current_process->_priority == 3 )
 		{
 			if ( _low._head == NULL && _low._tail == NULL )
 			{
-				_low._head = p;
-				_low._tail = p;
+				_low._head = current_process;
+				_low._tail = current_process;
 			}
 
 			else
 			{
-				_low._tail->_next = p;
-				_low._tail = p;
+				_low._tail->_next = current_process;
+				_low._tail = current_process;
 			}
 			printf
 			    ( "Placing process %d in the low priority queue\n",
-			      p->_process_identity );
+			      current_process->_process_identity );
 		}
 	}
 }
 
 proc ready_deq( u8 priority )
 {
-	proc p;
+	proc current_process;
 
 	switch ( priority )
 	{
@@ -174,17 +174,17 @@ proc ready_deq( u8 priority )
 			return NULL;
 		} else if ( _high._head == _high._tail && _high._head != NULL )
 		{
-			p = _high._head;
+			current_process = _high._head;
 			_high._head = NULL;
 			_high._tail = NULL;
 		} else
 		{
-			p = _high._head;
-			_high._head = p->_next;
-			p->_next = NULL;
+			current_process = _high._head;
+			_high._head = current_process->_next;
+			current_process->_next = NULL;
 		}
 		printf( "Removing process %d from the high priority queue\n",
-			p->_process_identity );
+			current_process->_process_identity );
 		break;
 
 	case 2:
@@ -195,19 +195,19 @@ proc ready_deq( u8 priority )
 		} else if ( _medium._head == _medium._tail
 			    && _medium._head != NULL )
 		{
-			p = _medium._head;
+			current_process = _medium._head;
 			_medium._head = NULL;
 			_medium._tail = NULL;
 		} else
 		{
 
-			p = _medium._head;
-			_medium._head = p->_next;
-			p->_next = NULL;
+			current_process = _medium._head;
+			_medium._head = current_process->_next;
+			current_process->_next = NULL;
 		}
 
 		printf( "Removing process %d from the medium priority queue\n",
-			p->_process_identity );
+			current_process->_process_identity );
 		break;
 
 	case 3:
@@ -217,20 +217,20 @@ proc ready_deq( u8 priority )
 			return NULL;
 		} else if ( _low._head == _low._tail && _low._head != NULL )
 		{
-			p = _low._head;
+			current_process = _low._head;
 			_low._head = NULL;
 			_low._tail = NULL;
 		} else
 		{
-			p = _low._head;
-			_low._head = p->_next;
-			p->_next = NULL;
+			current_process = _low._head;
+			_low._head = current_process->_next;
+			current_process->_next = NULL;
 		}
 		printf( "Removing process %d from the low priority queue\n",
-			p->_process_identity );
+			current_process->_process_identity );
 		break;
 	}
-	return p;
+	return current_process;
 }
 
 //
@@ -288,129 +288,129 @@ u16 get_finished(  )
 }
 
 //
-void process_exec( proc p )
+void process_exec( proc current_process )
 {
 
-	if ( p->_run_counter < 1 )
+	if ( current_process->_run_counter < 1 )
 	{
-		vas_free( p->_sbt, p->_vas );
+		vas_free( current_process->_sbt, current_process->_vas );
 
 		int index;
-		for ( index = 0; index < p->_vas; index++ )
+		for ( index = 0; index < current_process->_vas; index++ )
 		{
-			u16 l2 = get_addressess( p->_pti, index );
-			clear_pinned( l2 );
+			u16 level_two = address_get( current_process->_pti, index );
+			unset_pinned_bit( level_two );
 		}
-		clear_pinned( p->_pti );
-		printf( "Process %d has finished executing\n", p->_process_identity );
+		unset_pinned_bit( current_process->_pti );
+		printf( "Process %d has finished executing\n", current_process->_process_identity );
 		finished++;
 		printf( "%d processes have finished executing\n",
 			get_finished(  ) );
 		return;
 	}
 
-	printf( "Executing process %d\n", p->_process_identity );
+	printf( "Executing process %d\n", current_process->_process_identity );
 
-	u32 code_trans = virt_to_phys( p->_code_address, p );
-	u32 data_trans = virt_to_phys( p->_data_address, p );
+	u32 code_trans = virtual_to_physical( current_process->_code_address, current_process );
+	u32 data_trans = virtual_to_physical( current_process->_data_address, current_process );
 
-	u64 timer = p->_time;
+	u64 timer = current_process->_time;
 
 	if ( !code_trans )
 	{
 		printf( "fault on code\n" );
-		page_fault( p->_code_address, p );
+		page_fault( current_process->_code_address, current_process );
 		return;
 	}
 
-	set_used( code_trans );
+	set_used_bit( code_trans );
 
 	if ( !data_trans )
 	{
 		printf( "fault on data\n" );
-		page_fault( p->_data_address, p );
+		page_fault( current_process->_data_address, current_process );
 		return;
 	}
 
-	set_used( data_trans );
+	set_used_bit( data_trans );
 
 	while ( timer )
 	{
-		if ( p->_code_time < p->_data_time )
+		if ( current_process->_code_time < current_process->_data_time )
 		{
-			if ( p->_code_time > timer )
+			if ( current_process->_code_time > timer )
 			{
 				printf( "Process %d ran out of time\n",
-					p->_process_identity );
+					current_process->_process_identity );
 
-				p->_code_time -= timer;
+				current_process->_code_time -= timer;
 				time_advance( timer );
 				timer -= timer;
-				ready_enq( p );
-				p->_run_counter--;
+				ready_enqueue( current_process );
+				current_process->_run_counter--;
 				return;
 			}
 
 			else
 			{
-				time_advance( p->_code_time );
-				timer -= p->_code_time;
+				time_advance( current_process->_code_time );
+				timer -= current_process->_code_time;
 
-				p->_code_address =
-				    new_code_address( p->_code_address,
-						   p->_code_size );
-				p->_code_time = new_code_time(  );
-				code_trans = virt_to_phys( p->_code_address, p );
-				p->_run_counter--;
+				current_process->_code_address =
+				    new_code_address( current_process->_code_address,
+						   current_process->_code_size );
+				current_process->_code_time = new_code_time(  );
+				code_trans = virtual_to_physical( current_process->_code_address, current_process );
+				current_process->_run_counter--;
 			}
 
 			if ( !code_trans )
 			{
 				printf( "fault on code\n" );
-				page_fault( p->_code_address, p );
+				page_fault( current_process->_code_address, current_process );
 				return;
 			}
 
-			set_used( code_trans );
+			set_used_bit( code_trans );
 		}
 
 		else
 		{
-			if ( p->_data_time > timer )
+			if ( current_process->_data_time > timer )
 			{
 				printf( "Process %d ran out of time\n",
-					p->_process_identity );
+					current_process->_process_identity );
 
-				p->_data_time -= timer;
+				current_process->_data_time -= timer;
 				time_advance( timer );
 				timer -= timer;
-				ready_enq( p );
-				p->_run_counter--;
+				ready_enqueue( current_process );
+				current_process->_run_counter--;
 				return;
 			}
 
 			else
 			{
-				time_advance( p->_data_time );
-				timer -= p->_data_time;
+				time_advance( current_process->_data_time );
+				timer -= current_process->_data_time;
 
-				p->_data_address =
-				    new_data_address( p->_data_address, p->_code_size,
-						   ( p->_code_size +
-						     p->_data_size ) );
-				p->_data_time = new_data_time(  );
-				data_trans = virt_to_phys( p->_data_address, p );
-				p->_run_counter--;
+				current_process->_data_address =
+				    new_data_address( current_process->_data_address, current_process->_code_size,
+						   ( current_process->_code_size +
+						     current_process->_data_size ) );
+				current_process->_data_time = new_data_time(  );
+				data_trans = virtual_to_physical( current_process->_data_address, current_process );
+				current_process->_run_counter--;
 			}
 
 			if ( !data_trans )
 			{
 				printf( "fault on data\n" );
-				page_fault( p->_data_address, p );
+				page_fault( current_process->_data_address, current_process );
 				return;
 			}
 
-			set_used( data_trans );
+			set_used_bit( data_trans );
 		}
 	}
 }
@@ -441,8 +441,8 @@ int init_process( u8 priority, u32 csize, u32 dsize, u64 t )
 
 	if ( enough_space )
 	{
-		np->_process_identity = num_proc;
-		num_proc++;
+		np->_process_identity = number_of_processes;
+		number_of_processes++;
 
 		np->_priority = priority;
 		np->_time = t;
@@ -458,37 +458,37 @@ int init_process( u8 priority, u32 csize, u32 dsize, u64 t )
 		np->_run_counter = 5;
 		np->_next = NULL;
 
-		u16 alloc = page_alloc(  );
+		u16 allocation = page_allocation(  );
 
-		if ( !alloc )
+		if ( !allocation )
 		{
 			u16 swap_page = walk_page_ring(  );
 			page_free( swap_page );
 
-			alloc = page_alloc(  );
+			allocation = page_allocation(  );
 		}
 
-		np->_pti = alloc;
-		set_pinned( alloc );
+		np->_pti = allocation;
+		set_pinned_bit( allocation );
 
 		int index;
 		for ( index = 0; index < np->_vas; index++ )
 		{
-			u16 alloc = page_alloc(  );
+			u16 allocation = page_allocation(  );
 
-			if ( !alloc )
+			if ( !allocation )
 			{
 				u16 swap_page = walk_page_ring(  );
 				page_free( swap_page );
-				alloc = page_alloc(  );
+				allocation = page_allocation(  );
 			}
 
-			insert_addressess( np->_pti, index, alloc );
-			set_pinned( alloc );
+			address_set( np->_pti, index, allocation );
+			set_pinned_bit( allocation );
 		}
 
 		printf( "Creating new process, id: %d\n", np->_process_identity );
-		ready_enq( np );
+		ready_enqueue( np );
 		return 1;
 	} else
 	{

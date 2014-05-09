@@ -215,7 +215,7 @@ int main(  )
 	int counter = 0;
 	init_queues(  );
 	time_advance( 20 );
-	emancipation_proclamation(  );
+	page_free_all(  );
 
 	do
 	{
