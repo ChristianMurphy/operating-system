@@ -31,8 +31,8 @@ u16 page_allocation(  );
 void page_free( u16 x );
 void page_free_all(  );
 
-int vas_alloc( u16 v[], u32 size );
-void vas_free( u16 v[], u32 size );
+int virtual_address_space_allocation( u16 virtual_space[], u32 size );
+void vas_free( u16 virtual_space[], u32 size );
 
 u32 virtual_to_physical( u32 address, proc current_process );
 void page_fault( u32 address, proc current_process );

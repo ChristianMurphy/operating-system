@@ -213,7 +213,7 @@ struct {
 int main(  )
 {
 	int counter = 0;
-	init_queues(  );
+	initialize_queues(  );
 	time_advance( 20 );
 	page_free_all(  );
 
@@ -225,7 +225,7 @@ int main(  )
 		{
 
 			int success =
-			    init_process( process_initialize[counter]._priority,
+			    initialize_process( process_initialize[counter]._priority,
 					  process_initialize[counter]._code_size,
 					  process_initialize[counter]._data_size,
 					  process_initialize[counter]._run_time );

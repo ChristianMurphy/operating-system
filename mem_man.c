@@ -6,11 +6,11 @@
 
 #define	PAGE_COUNT 65536
 #define	PAGE_MASK	(PAGE_COUNT - 1)
-#define	VAS_VEC_SIZE (1 << 6)
-#define	VAS_VEC_SIZE_MASK (VAS_VEC_SIZE - 1)
+#define	virtual_address_space_vector_SIZE (1 << 6)
+#define	virtual_address_space_vector_SIZE_MASK (virtual_address_space_vector_SIZE - 1)
 
 // all of the pages
-static page mem[PAGE_COUNT];
+static page page_memory[PAGE_COUNT];
 
 // first available page
 static u16 page_availible = 1;
@@ -18,10 +18,10 @@ static u16 page_availible = 1;
 // meta data for the memory
 static memory_manage_structure memory_manager[PAGE_COUNT] = { 0 };
 
-static u16 mem_offset = 1;
+static u16 memory_offset = 1;
 
 // this is a 2^6 by 2^6 memory space that represents a page table
-static u64 vas_vec[VAS_VEC_SIZE] = { 0 };
+static u64 virtual_address_space_vector[virtual_address_space_vector_SIZE] = { 0 };
 
 static u32 virtual_address_space_offset = 0;
 static u32 virtual_address_space_count = 4096;
@@ -38,7 +38,7 @@ void write_page( u16 page_number )
 
 page get_page( u32 address )
 {
-	return mem[address];
+	return page_memory[address];
 }
 
 void set_used_bit( u16 page_number )
@@ -58,13 +58,13 @@ void unset_pinned_bit( u16 page_number )
 
 void address_set( u16 page_number, int index, u16 address )
 {
-	mem[page_number]._u32[index] = address;
+	page_memory[page_number]._u32[index] = address;
 	printf( "Page %d index %d is storing address\n", page_number, index, address );
 }
 
 u16 address_get( u16 page_number, int index )
 {
-	u32 a = mem[page_number]._u32[index];
+	u32 a = page_memory[page_number]._u32[index];
 	u16 b = a & 0xFFFF;
 	return b;
 }
@@ -77,12 +77,12 @@ u16 page_allocation(  )
 	u16 t = page_availible;
 	if ( page_availible )
 	{
-		page_availible = mem[page_availible]._u16[0];
+		page_availible = page_memory[page_availible]._u16[0];
 	}
 	int index;
 	for ( index = 0; index < 512; index++ )
 	{
-		mem[t]._u64[index] = 0;
+		page_memory[t]._u64[index] = 0;
 	}
 	return t;
 }
@@ -98,7 +98,7 @@ void page_free( u16 page_index )
         write_page(page_index);
 	}
 
-	mem[page_index]._u16[0] = page_availible;
+	page_memory[page_index]._u16[0] = page_availible;
 	page_availible = page_index;
 }
 
@@ -107,7 +107,7 @@ void page_free_all(  )
 	u16 index;
 	for ( index = 1; index < PAGE_COUNT - 1; index++ )
 	{
-		mem[index]._u16[0] = index + 1;
+		page_memory[index]._u16[0] = index + 1;
 	}
 }
 
@@ -118,7 +118,7 @@ u32 virtual_to_physical( u32 address, proc current_process )
 	u32 level_two_index = ( ( address >> 12 ) & 0x3FF );
 
 	u16 level_one_address = current_process->_pti;
-	page level_one = mem[level_one_address];
+	page level_one = page_memory[level_one_address];
 	u32 level_two_address = level_one._u32[level_one_index];
 
 	if ( !level_two_address )
@@ -126,7 +126,7 @@ u32 virtual_to_physical( u32 address, proc current_process )
 		return 0;
 	}
 
-	page level_two = mem[level_two_address];
+	page level_two = page_memory[level_two_address];
 	u32 physical_address = level_two._u32[level_two_index];
 
 	if ( !physical_address )
@@ -156,7 +156,7 @@ void page_fault( u32 address, proc current_process )
 	u32 level_one_index = address >> 22;
 	u32 level_two_index = ( ( address >> 12 ) & 0x3FF );
 	u16 level_one_address = current_process->_pti;
-	page level_one = mem[level_one_address];
+	page level_one = page_memory[level_one_address];
 	u32 level_two_address = level_one._u32[level_one_index];
 
 	u64 d_time = disk_read( address, allocation );
@@ -165,7 +165,7 @@ void page_fault( u32 address, proc current_process )
 }
 
 // Array is the sbt from proc(index believe), size is the number of chunks a process wants.
-int vas_alloc( u16 v[], u32 size )
+int virtual_address_space_allocation( u16 virtual_space[], u32 size )
 {
 	int result = 0;
 
@@ -174,7 +174,7 @@ int vas_alloc( u16 v[], u32 size )
 		int index;
 		for ( index = 0; index < size; index++ )
 		{
-			while ( vas_vec[virtual_address_space_offset] == 0xFFFFFFFFFFFFFFFF )
+			while ( virtual_address_space_vector[virtual_address_space_offset] == 0xFFFFFFFFFFFFFFFF )
 			{
 				virtual_address_space_offset++;
 				if ( virtual_address_space_offset > 63 )
@@ -184,18 +184,18 @@ int vas_alloc( u16 v[], u32 size )
 			}
 
 			// Find a free chunk and record its position
-			u16 bit_pos = ( u16 ) least_significant_bit64( vas_vec[virtual_address_space_offset] );
+			u16 bit_position = ( u16 ) least_significant_bit64( virtual_address_space_vector[virtual_address_space_offset] );
 			// Create an addressess of the chunk level index and position
-			u16 chunk_addressess = ( virtual_address_space_offset << 8 ) | ( bit_pos );
+			u16 chunk_addressess = ( virtual_address_space_offset << 8 ) | ( bit_position );
 			// Store addressess in the passed in array
-			v[index] = chunk_addressess;
+			virtual_space[index] = chunk_addressess;
 
 			u64 flipped_bit = 1;
-			flipped_bit = flipped_bit << bit_pos;
+			flipped_bit = flipped_bit << bit_position;
 
-			// Flip the bit at virtual_address_space_offset and bit_post to indicate allocated memory
-			vas_vec[virtual_address_space_offset] =
-			    vas_vec[virtual_address_space_offset] | ( flipped_bit );
+			// Flip the bit at virtual_address_space_offset and bit_positiont to indicate allocated memory
+			virtual_address_space_vector[virtual_address_space_offset] =
+			    virtual_address_space_vector[virtual_address_space_offset] | ( flipped_bit );
 
 			// If the row is completely allocated
 			virtual_address_space_count--;
@@ -208,20 +208,20 @@ int vas_alloc( u16 v[], u32 size )
 }
 
 // Array is the sbt from proc(index believe), size is the number of chunks a process wants.
-void vas_free( u16 v[], u32 size )
+void vas_free( u16 virtual_space[], u32 size )
 {
 	int index;
 	for ( index = 0; index < size; index++ )
 	{
 		// Get an addressess of a chunk to be free
-		u16 chunk_addressess = v[index];
-		u16 bit_pos = chunk_addressess & 0x00FF;
+		u16 chunk_addressess = virtual_space[index];
+		u16 bit_position = chunk_addressess & 0x00FF;
 		u16 virtual_address_space_offset_temparary = chunk_addressess >> 8;
 
 		u64 flipped_bit = 1;
-		flipped_bit = flipped_bit << bit_pos;
-		vas_vec[virtual_address_space_offset_temparary] =
-		    vas_vec[virtual_address_space_offset_temparary] & ~( flipped_bit );
+		flipped_bit = flipped_bit << bit_position;
+		virtual_address_space_vector[virtual_address_space_offset_temparary] =
+		    virtual_address_space_vector[virtual_address_space_offset_temparary] & ~( flipped_bit );
 
 		virtual_address_space_count++;
 	}

@@ -16,13 +16,13 @@ static int counter = 0;
 static u64 time = 0;
 static u64 time_blocked = 0;
 static u16 number_of_processes = 1;
-static u16 finished = 0;
+static u16 completed_processes = 0;
 
 // initial addressess, process time, time prediction, priority, and something else
 
 void blocked_enqueue( proc current_process, u64 estimated_time )
 {
-	printf( "Placing process %d in the blocked queue\n", current_process->_process_identity );
+	printf( "process %d is blocked\n", current_process->_process_identity );
 
 	current_process->_blocked_timer = estimated_time;
 	if ( _blocked._head == NULL )
@@ -35,7 +35,7 @@ void blocked_enqueue( proc current_process, u64 estimated_time )
 	}
 }
 
-void blocked_deq(  )
+void blocked_dequeue(  )
 {
 	if ( _blocked._head == NULL )
 	{
@@ -284,7 +284,7 @@ void time_advance( u64 time_delta )
 
 u16 get_finished(  )
 {
-	return finished;
+	return completed_processes;
 }
 
 //
@@ -303,36 +303,36 @@ void process_exec( proc current_process )
 		}
 		unset_pinned_bit( current_process->_pti );
 		printf( "Process %d has finished executing\n", current_process->_process_identity );
-		finished++;
+		completed_processes++;
 		printf( "%d processes have finished executing\n",
 			get_finished(  ) );
 		return;
 	}
 
-	printf( "Executing process %d\n", current_process->_process_identity );
+	printf( "process %d executing\n", current_process->_process_identity );
 
-	u32 code_trans = virtual_to_physical( current_process->_code_address, current_process );
-	u32 data_trans = virtual_to_physical( current_process->_data_address, current_process );
+	u32 code_translation = virtual_to_physical( current_process->_code_address, current_process );
+	u32 data_translation = virtual_to_physical( current_process->_data_address, current_process );
 
 	u64 timer = current_process->_time;
 
-	if ( !code_trans )
+	if ( !code_translation )
 	{
-		printf( "fault on code\n" );
+        printf( "page fault for code page\n" );
 		page_fault( current_process->_code_address, current_process );
 		return;
 	}
 
-	set_used_bit( code_trans );
+	set_used_bit( code_translation );
 
-	if ( !data_trans )
+	if ( !data_translation )
 	{
-		printf( "fault on data\n" );
+		printf( "page fault for data page\n" );
 		page_fault( current_process->_data_address, current_process );
 		return;
 	}
 
-	set_used_bit( data_trans );
+	set_used_bit( data_translation );
 
 	while ( timer )
 	{
@@ -340,7 +340,7 @@ void process_exec( proc current_process )
 		{
 			if ( current_process->_code_time > timer )
 			{
-				printf( "Process %d ran out of time\n",
+				printf( "process %d timed out\n",
 					current_process->_process_identity );
 
 				current_process->_code_time -= timer;
@@ -360,18 +360,18 @@ void process_exec( proc current_process )
 				    new_code_address( current_process->_code_address,
 						   current_process->_code_size );
 				current_process->_code_time = new_code_time(  );
-				code_trans = virtual_to_physical( current_process->_code_address, current_process );
+				code_translation = virtual_to_physical( current_process->_code_address, current_process );
 				current_process->_run_counter--;
 			}
 
-			if ( !code_trans )
+			if ( !code_translation )
 			{
 				printf( "fault on code\n" );
 				page_fault( current_process->_code_address, current_process );
 				return;
 			}
 
-			set_used_bit( code_trans );
+			set_used_bit( code_translation );
 		}
 
 		else
@@ -399,24 +399,24 @@ void process_exec( proc current_process )
 						   ( current_process->_code_size +
 						     current_process->_data_size ) );
 				current_process->_data_time = new_data_time(  );
-				data_trans = virtual_to_physical( current_process->_data_address, current_process );
+				data_translation = virtual_to_physical( current_process->_data_address, current_process );
 				current_process->_run_counter--;
 			}
 
-			if ( !data_trans )
+			if ( !code_translation )
 			{
-				printf( "fault on data\n" );
+				printf( "page fault for code\n" );
 				page_fault( current_process->_data_address, current_process );
 				return;
 			}
 
-			set_used_bit( data_trans );
+			set_used_bit( data_translation );
 		}
 	}
 }
 
 // Initialize values in the queues
-void init_queues(  )
+void initialize_queues(  )
 {
 	_blocked._head = NULL;
 
@@ -431,13 +431,13 @@ void init_queues(  )
 }
 
 // Initializes a process
-int init_process( u8 priority, u32 csize, u32 dsize, u64 t )
+int initialize_process( u8 priority, u32 csize, u32 dsize, u64 t )
 {
 	proc np = malloc( sizeof( *np ) );
 
 	np->_vas = ( ( ( ( csize + dsize ) / 1000 ) / 1000 ) / 4 );
 
-	int enough_space = vas_alloc( np->_sbt, np->_vas );
+	int enough_space = virtual_address_space_allocation( np->_sbt, np->_vas );
 
 	if ( enough_space )
 	{
@@ -513,7 +513,7 @@ void scheduler(  )
 {
 	proc gp;
 	time_advance( 10000 );
-	blocked_deq(  );
+	blocked_dequeue(  );
 
 	switch ( counter )
 	{

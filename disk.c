@@ -15,7 +15,7 @@ static u32 write_latency = 8 << 20;
 static u64 disk_time = 0;
 
 //allocates the swap space
-int swap_allocation( u16 v[], u32 size )
+int swap_allocation( u16 virtual_space[], u32 size )
 {
 	u32 index;
 	u32 t;
@@ -31,7 +31,7 @@ int swap_allocation( u16 v[], u32 size )
 		{
 			t = least_significant_bit64( avail[offset] );
 			avail[offset] |= 1ul << t;
-			v[index] = ( offset << 6 ) | t;
+			virtual_space[index] = ( offset << 6 ) | t;
 		} else
 			offset = ( offset + 1 ) & SWAP_SIZE_MASK;
 	}
@@ -40,12 +40,12 @@ int swap_allocation( u16 v[], u32 size )
 }
 
 //frees swap space
-void swap_free( u16 v[], u32 size )
+void swap_free( u16 virtual_space[], u32 size )
 {
 	u32 index;
 
 	for ( index = 0; index < size; ++index )
-		avail[v[index] >> 6] &= ~( 1ul << ( v[index] & 63 ) );
+		avail[virtual_space[index] >> 6] &= ~( 1ul << ( virtual_space[index] & 63 ) );
 	count += size;
 }
 

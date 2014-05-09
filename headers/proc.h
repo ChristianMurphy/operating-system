@@ -40,7 +40,7 @@ typedef struct ready {
 } ready;
 
 void blocked_enqueue( proc current_process, u64 estimated_time );
-void blocked_deq(  );
+void blocked_dequeue(  );
 
 void ready_enqueue( proc current_process );
 proc ready_deq( u8 priority );
@@ -49,8 +49,8 @@ u64 time_get(  );
 void time_advance( u64 time_delta );
 u16 get_finished(  );
 
-void init_queues(  );
-int init_process( u8 current_process, u32 csize, u32 dsize, u64 t );
+void initialize_queues(  );
+int initialize_process( u8 current_process, u32 csize, u32 dsize, u64 t );
 u8 empty_queues(  );
 
 u32 new_code_address( u32 address, u32 limit );
