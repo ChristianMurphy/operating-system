@@ -1,17 +1,9 @@
-#include    <stdio.h>
-#include    <stdlib.h>
-#include    "headers/types.h"
-#include    "headers/util.h"
-#include    "headers/proc.h"
-#include    "headers/disk.h"
-#include    "headers/mem_man.h"
+#include <stdio.h>
+#include "headers/types.h"
+#include "headers/util.h"
 
-#define SWAP_SIZE       ((1 << 6))
-#define SWAP_SIZE_MASK  (SWAP_SIZE - 1)
-
-/**
- * Christian Murphy
- */
+#define	SWAP_SIZE	 ((1 << 6))
+#define	SWAP_SIZE_MASK (SWAP_SIZE - 1)
 
 static u64 avail[SWAP_SIZE] = { 1, 0 };
 
@@ -24,68 +16,88 @@ static u64 disk_time = 0;
 
 int swap_alloc( u16 v[], u32 size )
 {
-    u32 i;
-    u32 t;
+	u32 i;
+	u32 t;
 
-    if ( count < size )
-        return 0;
-    for ( i = 0; i < size; ++i )
-    {
-        if ( ~( avail[offset] ) )
-        {
-            t = lsb64( avail[offset] );
-            avail[offset] |= 1ul << t;
-            v[i] = ( offset << 6 ) | t;
-        } else
-            offset = ( offset + 1 ) & SWAP_SIZE_MASK;
-    }
-    count -= size;
-    return 1;
+	if ( count < size )
+	{
+		return 0;
+	}
+
+	for ( i = 0; i < size; ++i )
+	{
+		if ( ~( avail[offset] ) )
+		{
+			t = lsb64( avail[offset] );
+			avail[offset] |= 1ul << t;
+			v[i] = ( offset << 6 ) | t;
+		} else
+			offset = ( offset + 1 ) & SWAP_SIZE_MASK;
+	}
+	count -= size;
+	return 1;
 }
 
 void swap_free( u16 v[], u32 size )
 {
-    u32 i;
+	u32 i;
 
-    for ( i = 0; i < size; ++i )
-        avail[v[i] >> 6] &= ~( 1ul << ( v[i] & 63 ) );
-    count += size;
+	for ( i = 0; i < size; ++i )
+		avail[v[i] >> 6] &= ~( 1ul << ( v[i] & 63 ) );
+	count += size;
 }
-
-//////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////
 
 u64 disk_read( u32 block, u16 addr )
 {
-    printf( "reading block %d from disk at address %d\n", block, addr );
-    u32 delta = rand(  );
-    if ( time_get(  ) > disk_time )
-        disk_time = time_get(  );
-    if ( delta & 1 )
-        disk_time += read_latency + ( delta & 0x3FFFFF );
-    else
-        disk_time += read_latency - ( delta & 0x1FFFFF );
-    if ( block < SWAP_SIZE )
-    {
-        write_page_to_memory( addr );
-    }
-    return disk_time;
+	printf( "Reading block %d from disk\n", block );
+
+	u32 delta = rand(  );
+
+	if ( time_get(  ) > disk_time )
+	{
+		disk_time = time_get(  );
+	}
+
+	if ( delta & 1 )
+	{
+		disk_time += read_latency + ( delta & 0x3FFFFF );
+	}
+
+	else
+	{
+		disk_time += read_latency - ( delta & 0x1FFFFF );
+	}
+
+	if ( block < SWAP_SIZE )
+	{
+		//Create some garbage page that represents data from disk
+		write_page( addr );
+	}
+
+	return disk_time;
 }
 
 u64 disk_write( u32 block, u16 addr )
 {
-    printf( "writing block %d to disk at address %d\n", block, addr );
-    u32 delta = rand(  );
-    if ( time_get(  ) > disk_time )
-        disk_time = time_get(  );
-    if ( delta & 1 )
-        disk_time += write_latency + ( delta & 0x3FFFFF );
-    else
-        disk_time += write_latency - ( delta & 0x1FFFFF );
-    if ( block < SWAP_SIZE )
-    {
-        read_page_from_memory( addr );
-    }
-    return disk_time;
+	u32 delta = rand(  );
+
+	if ( time_get(  ) > disk_time )
+		disk_time = time_get(  );
+
+	if ( delta & 1 )
+	{
+		disk_time += write_latency + ( delta & 0x3FFFFF );
+	}
+
+	else
+	{
+		disk_time += write_latency - ( delta & 0x1FFFFF );
+	}
+
+	if ( block < SWAP_SIZE )
+	{
+		read_page( addr );
+	}
+
+	return disk_time;
 }

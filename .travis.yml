@@ -1,7 +1,7 @@
 language: c
 compiler:
 - gcc
-- clang
+- clang -fsanitize=address-full -fsanitize-memory-track-origins
 script:
 - cc -std=c99 -g *.c
 - "./a.out"
