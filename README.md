@@ -45,8 +45,8 @@ program(
 
 ### what to do when there is a page fault
 1. check what process was using page
-    i.
+    index.
     ii. tell that process that the memory has been freed
 2. check if the page is clean
-    i. if the page is dirty store to disk
+    index. if the page is dirty store to disk
 3. write new page into that memory

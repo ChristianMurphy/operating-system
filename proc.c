@@ -295,10 +295,10 @@ void process_exec( proc p )
 	{
 		vas_free( p->_sbt, p->_vas );
 
-		int i;
-		for ( i = 0; i < p->_vas; i++ )
+		int index;
+		for ( index = 0; index < p->_vas; index++ )
 		{
-			u16 l2 = get_addressess( p->_pti, i );
+			u16 l2 = get_addressess( p->_pti, index );
 			clear_pinned( l2 );
 		}
 		clear_pinned( p->_pti );
@@ -471,8 +471,8 @@ int init_process( u8 priority, u32 csize, u32 dsize, u64 t )
 		np->_pti = alloc;
 		set_pinned( alloc );
 
-		int i;
-		for ( i = 0; i < np->_vas; i++ )
+		int index;
+		for ( index = 0; index < np->_vas; index++ )
 		{
 			u16 alloc = page_alloc(  );
 
@@ -483,7 +483,7 @@ int init_process( u8 priority, u32 csize, u32 dsize, u64 t )
 				alloc = page_alloc(  );
 			}
 
-			insert_addressess( np->_pti, i, alloc );
+			insert_addressess( np->_pti, index, alloc );
 			set_pinned( alloc );
 		}
 

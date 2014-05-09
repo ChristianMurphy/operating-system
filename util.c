@@ -1,7 +1,7 @@
 #include	<stdio.h>
 #include	"headers/types.h"
 
-u32 lsb8( u8 x )
+u32 least_significant_bit8( u8 x )
 {
 	u32 pos = 0;
 
@@ -22,12 +22,12 @@ u32 lsb8( u8 x )
 	}
 
 /*
-	u32	i;
+	u32	index;
 
-	for (i = 4; i > 0; i >>= 1) {
-		if (!(~x & ((1 << i) - 1))) {
-			pos  += i;
-			x	>>= i;
+	for (index = 4; index > 0; index >>= 1) {
+		if (!(~x & ((1 << index) - 1))) {
+			pos  += index;
+			x	>>= index;
 		}
 	}
 */
@@ -35,7 +35,7 @@ u32 lsb8( u8 x )
 	return pos;
 }
 
-u32 lsb16( u16 x )
+u32 least_significant_bit16( u16 x )
 {
 	u32 pos = 0;
 
@@ -61,12 +61,12 @@ u32 lsb16( u16 x )
 	}
 
 /*
-	u32	i;
+	u32	index;
 
-	for (i = 5; i > 0; i >>= 1) {
-		if (!(~x & ((1 << i) - 1))) {
-			pos  += i;
-			x	>>= i;
+	for (index = 5; index > 0; index >>= 1) {
+		if (!(~x & ((1 << index) - 1))) {
+			pos  += index;
+			x	>>= index;
 		}
 	}
 */
@@ -74,7 +74,7 @@ u32 lsb16( u16 x )
 	return pos;
 }
 
-u32 lsb32( u32 x )
+u32 least_significant_bit32( u32 x )
 {
 	u32 pos = 0;
 
@@ -105,12 +105,12 @@ u32 lsb32( u32 x )
 	}
 
 /*
-	u32	i;
+	u32	index;
 
-	for (i = 6; i > 0; i >>= 1) {
-		if (!(~x & ((1 << i) - 1))) {
-			pos  += i;
-			x	>>= i;
+	for (index = 6; index > 0; index >>= 1) {
+		if (!(~x & ((1 << index) - 1))) {
+			pos  += index;
+			x	>>= index;
 		}
 	}
 */
@@ -118,7 +118,7 @@ u32 lsb32( u32 x )
 	return pos;
 }
 
-u32 lsb64( u64 x )
+u32 least_significant_bit64( u64 x )
 {
 	u32 pos = 0;
 
@@ -154,12 +154,12 @@ u32 lsb64( u64 x )
 	}
 
 /*
-	u32	i;
+	u32	index;
 
-	for (i = 7; i > 0; i >>= 1) {
-		if (!(~x & ((1l << i) - 1))) {
-			pos  += i;
-			x	>>= i;
+	for (index = 7; index > 0; index >>= 1) {
+		if (!(~x & ((1l << index) - 1))) {
+			pos  += index;
+			x	>>= index;
 		}
 	}
 */
@@ -171,15 +171,15 @@ u32 lsb64( u64 x )
 
 int main(  )
 {
-	int i;
+	int index;
 	int x;
 	int page_number;
 	int z;
 
-	for ( i = 0; i < 256; ++i )
+	for ( index = 0; index < 256; ++index )
 	{
-		x = lsb8( i );
-		printf( "lsb8(i) = %02x\n", x );
+		x = least_significant_bit8( index );
+		printf( "least_significant_bit8(index) = %02x\n", x );
 	}
 
 }

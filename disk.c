@@ -16,7 +16,7 @@ static u64 disk_time = 0;
 
 int swap_alloc( u16 v[], u32 size )
 {
-	u32 i;
+	u32 index;
 	u32 t;
 
 	if ( count < size )
@@ -24,13 +24,13 @@ int swap_alloc( u16 v[], u32 size )
 		return 0;
 	}
 
-	for ( i = 0; i < size; ++i )
+	for ( index = 0; index < size; ++index )
 	{
 		if ( ~( avail[offset] ) )
 		{
-			t = lsb64( avail[offset] );
+			t = least_significant_bit64( avail[offset] );
 			avail[offset] |= 1ul << t;
-			v[i] = ( offset << 6 ) | t;
+			v[index] = ( offset << 6 ) | t;
 		} else
 			offset = ( offset + 1 ) & SWAP_SIZE_MASK;
 	}
@@ -40,10 +40,10 @@ int swap_alloc( u16 v[], u32 size )
 
 void swap_free( u16 v[], u32 size )
 {
-	u32 i;
+	u32 index;
 
-	for ( i = 0; i < size; ++i )
-		avail[v[i] >> 6] &= ~( 1ul << ( v[i] & 63 ) );
+	for ( index = 0; index < size; ++index )
+		avail[v[index] >> 6] &= ~( 1ul << ( v[index] & 63 ) );
 	count += size;
 }
 

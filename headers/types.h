@@ -30,7 +30,12 @@ typedef union {
 } page;
 
 typedef enum {
-	Code, Data, File, Network, Keyboard, Timer
+	Code,
+    Data,
+    File,
+    Network,
+    Keyboard,
+    Timer
 } dev_type;
 
 #endif

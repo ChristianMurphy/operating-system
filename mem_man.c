@@ -23,7 +23,7 @@ static u16 mem_offset = 1;
 // Bitmap. 64 levels of 64 bits. each bit is a chunk of 4mb that represents a page table.
 static u64 vas_vec[VAS_VEC_SIZE] = { 0 };
 
-static u32 vas_offset = 0;
+static u32 virtual_address_space_offset = 0;
 static u32 vas_count = 4096;
 
 void read_page( u16 page_number )
@@ -79,10 +79,10 @@ u16 page_alloc(  )
 	{
 		page_avail = mem[page_avail]._u16[0];
 	}
-	int i;
-	for ( i = 0; i < 512; i++ )
+	int index;
+	for ( index = 0; index < 512; index++ )
 	{
-		mem[t]._u64[i] = 0;
+		mem[t]._u64[index] = 0;
 	}
 	return t;
 }
@@ -103,10 +103,10 @@ void page_free( u16 x )
 
 void emancipation_proclamation(  )
 {
-	u16 i;
-	for ( i = 1; i < PAGE_COUNT - 1; i++ )
+	u16 index;
+	for ( index = 1; index < PAGE_COUNT - 1; index++ )
 	{
-		mem[i]._u16[0] = i + 1;
+		mem[index]._u16[0] = index + 1;
 	}
 }
 
@@ -163,38 +163,38 @@ void page_fault( u32 address, proc p )
 	blocked_enq( p, d_time );
 }
 
-// Array is the sbt from proc(I believe), size is the number of chunks a process wants.
+// Array is the sbt from proc(index believe), size is the number of chunks a process wants.
 int vas_alloc( u16 v[], u32 size )
 {
 	int result = 0;
 
 	if ( size <= vas_count )
 	{
-		int i;
-		for ( i = 0; i < size; i++ )
+		int index;
+		for ( index = 0; index < size; index++ )
 		{
-			while ( vas_vec[vas_offset] == 0xFFFFFFFFFFFFFFFF )
+			while ( vas_vec[virtual_address_space_offset] == 0xFFFFFFFFFFFFFFFF )
 			{
-				vas_offset++;
-				if ( vas_offset > 63 )
+				virtual_address_space_offset++;
+				if ( virtual_address_space_offset > 63 )
 				{
-					vas_offset = 0;
+					virtual_address_space_offset = 0;
 				}
 			}
 
 			// Find a free chunk and record its position
-			u16 bit_pos = ( u16 ) lsb64( vas_vec[vas_offset] );
+			u16 bit_pos = ( u16 ) least_significant_bit64( vas_vec[virtual_address_space_offset] );
 			// Create an addressess of the chunk level index and position
-			u16 chunk_addressess = ( vas_offset << 8 ) | ( bit_pos );
+			u16 chunk_addressess = ( virtual_address_space_offset << 8 ) | ( bit_pos );
 			// Store addressess in the passed in array
-			v[i] = chunk_addressess;
+			v[index] = chunk_addressess;
 
 			u64 flipped_bit = 1;
 			flipped_bit = flipped_bit << bit_pos;
 
-			// Flip the bit at vas_offset and bit_post to indicate allocated memory
-			vas_vec[vas_offset] =
-			    vas_vec[vas_offset] | ( flipped_bit );
+			// Flip the bit at virtual_address_space_offset and bit_post to indicate allocated memory
+			vas_vec[virtual_address_space_offset] =
+			    vas_vec[virtual_address_space_offset] | ( flipped_bit );
 
 			// If the row is completely allocated
 			vas_count--;
@@ -206,21 +206,21 @@ int vas_alloc( u16 v[], u32 size )
 	return result;
 }
 
-// Array is the sbt from proc(I believe), size is the number of chunks a process wants.
+// Array is the sbt from proc(index believe), size is the number of chunks a process wants.
 void vas_free( u16 v[], u32 size )
 {
-	int i;
-	for ( i = 0; i < size; i++ )
+	int index;
+	for ( index = 0; index < size; index++ )
 	{
 		// Get an addressess of a chunk to be free
-		u16 chunk_addressess = v[i];
+		u16 chunk_addressess = v[index];
 		u16 bit_pos = chunk_addressess & 0x00FF;
-		u16 vas_offset_temp = chunk_addressess >> 8;
+		u16 virtual_address_space_offset_temparary = chunk_addressess >> 8;
 
 		u64 flipped_bit = 1;
 		flipped_bit = flipped_bit << bit_pos;
-		vas_vec[vas_offset_temp] =
-		    vas_vec[vas_offset_temp] & ~( flipped_bit );
+		vas_vec[virtual_address_space_offset_temparary] =
+		    vas_vec[virtual_address_space_offset_temparary] & ~( flipped_bit );
 
 		vas_count++;
 	}
@@ -230,16 +230,16 @@ void vas_free( u16 v[], u32 size )
 // Set used to 0 for each page.
 u16 walk_page_ring(  )
 {
-	u16 temp = 0;
-	int i;
-	for ( i = 0; i < PAGE_COUNT; i++ )
+	u16 temparary = 0;
+	int index;
+	for ( index = 0; index < PAGE_COUNT; index++ )
 	{
-		if ( !( memory_manager[i]._used ) && !( memory_manager[i]._pinned ) )
+		if ( !( memory_manager[index]._used ) && !( memory_manager[index]._pinned ) )
 		{
-			temp = i;
+			temparary = index;
 			break;
 		}
-		memory_manager[i]._used = 0;
+		memory_manager[index]._used = 0;
 	}
-	return temp;
+	return temparary;
 }
