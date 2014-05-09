@@ -173,7 +173,7 @@ int main(  )
 {
 	int i;
 	int x;
-	int y;
+	int page_number;
 	int z;
 
 	for ( i = 0; i < 256; ++i )

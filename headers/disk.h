@@ -3,8 +3,8 @@
 
 #    include	"types.h"
 
-u64 disk_read( u32 block, u16 addr );
-u64 disk_write( u32 block, u16 addr );
+u64 disk_read( u32 block, u16 address );
+u64 disk_write( u32 block, u16 address );
 int in_alloc( u16 v[], u32 size );
 void in_free( u16 v[], u32 size );
 int lb_alloc( u16 v[], u32 size );

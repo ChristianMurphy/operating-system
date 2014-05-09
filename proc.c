@@ -18,11 +18,11 @@ static u64 time_blocked = 0;
 static u16 num_proc = 1;
 static u16 finished = 0;
 
-// initial address, process time, time prediction, priority, and something else
+// initial addressess, process time, time prediction, priority, and something else
 
 void blocked_enq( proc p, u64 estimated_time )
 {
-	printf( "Placing process %d in the blocked queue\n", p->_pid );
+	printf( "Placing process %d in the blocked queue\n", p->_process_identity );
 
 	p->_blocked_timer = estimated_time;
 	if ( _blocked._head == NULL )
@@ -50,7 +50,7 @@ void blocked_deq(  )
 		if ( cp->_blocked_timer <= time_get(  ) )
 		{
 			printf( "Removing process %d from the blocked queue\n",
-				_blocked._head->_pid );
+				_blocked._head->_process_identity );
 			ready_enq( _blocked._head );
 			_blocked._head = NULL;
 		}
@@ -69,7 +69,7 @@ void blocked_deq(  )
 					cp->_next = NULL;
 					printf
 					    ( "Removing process %d from the blocked queue\n",
-					      cp->_pid );
+					      cp->_process_identity );
 					ready_enq( cp );
 					cp = _blocked._head;
 					pp = cp;
@@ -79,7 +79,7 @@ void blocked_deq(  )
 					cp->_next = NULL;
 					printf
 					    ( "Removing process %d from the blocked queue\n",
-					      cp->_pid );
+					      cp->_process_identity );
 					ready_enq( cp );
 					cp = pp->_next;
 				}
@@ -120,7 +120,7 @@ void ready_enq( proc p )
 			}
 			printf
 			    ( "Placing process %d in the high priority queue\n",
-			      p->_pid );
+			      p->_process_identity );
 		}
 
 		if ( p->_priority == 2 )
@@ -138,7 +138,7 @@ void ready_enq( proc p )
 			}
 			printf
 			    ( "Placing process %d in the medium priority queue\n",
-			      p->_pid );
+			      p->_process_identity );
 		}
 
 		if ( p->_priority == 3 )
@@ -156,7 +156,7 @@ void ready_enq( proc p )
 			}
 			printf
 			    ( "Placing process %d in the low priority queue\n",
-			      p->_pid );
+			      p->_process_identity );
 		}
 	}
 }
@@ -184,7 +184,7 @@ proc ready_deq( u8 priority )
 			p->_next = NULL;
 		}
 		printf( "Removing process %d from the high priority queue\n",
-			p->_pid );
+			p->_process_identity );
 		break;
 
 	case 2:
@@ -207,7 +207,7 @@ proc ready_deq( u8 priority )
 		}
 
 		printf( "Removing process %d from the medium priority queue\n",
-			p->_pid );
+			p->_process_identity );
 		break;
 
 	case 3:
@@ -227,22 +227,22 @@ proc ready_deq( u8 priority )
 			p->_next = NULL;
 		}
 		printf( "Removing process %d from the low priority queue\n",
-			p->_pid );
+			p->_process_identity );
 		break;
 	}
 	return p;
 }
 
 //
-u32 new_code_addr( u32 addr, u32 limit )
+u32 new_code_address( u32 address, u32 limit )
 {
 	static u32 x[32] = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
 		2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 8, 16
 	};
 
 	u32 r = rand(  );
-	addr = ( r & 64 ) ? addr + x[r & 31] : addr - x[r & 31];
-	return ( addr > limit ) ? addr = r % limit : addr;
+	address = ( r & 64 ) ? address + x[r & 31] : address - x[r & 31];
+	return ( address > limit ) ? address = r % limit : address;
 }
 
 //
@@ -252,17 +252,17 @@ u64 new_code_time(  )
 }
 
 //
-u32 new_data_addr( u32 addr, u32 base, u32 limit )
+u32 new_data_address( u32 address, u32 base, u32 limit )
 {
 	static u32 x[32] = { 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4,
 		5, 5, 6, 6, 7, 7, 8, 8, 9, 10, 11, 12, 16, 20, 28, 40
 	};
 
 	u32 r = rand(  );
-	addr = ( r & 64 ) ? addr + x[r & 31] : addr - x[r & 31];
-	return ( ( base < addr )
-		 || ( addr > limit ) ) ? addr =
-	    base + ( r % ( limit - base ) ) : addr;
+	address = ( r & 64 ) ? address + x[r & 31] : address - x[r & 31];
+	return ( ( base < address )
+		 || ( address > limit ) ) ? address =
+	    base + ( r % ( limit - base ) ) : address;
 }
 
 //
@@ -277,9 +277,9 @@ u64 time_get(  )
 	return time;
 }
 
-void set_time( u64 t )
+void time_advance( u64 time_delta )
 {
-	time = t;
+	time = time += time_delta;
 }
 
 u16 get_finished(  )
@@ -298,28 +298,28 @@ void process_exec( proc p )
 		int i;
 		for ( i = 0; i < p->_vas; i++ )
 		{
-			u16 l2 = get_address( p->_pti, i );
+			u16 l2 = get_addressess( p->_pti, i );
 			clear_pinned( l2 );
 		}
 		clear_pinned( p->_pti );
-		printf( "Process %d has finished executing\n", p->_pid );
+		printf( "Process %d has finished executing\n", p->_process_identity );
 		finished++;
 		printf( "%d processes have finished executing\n",
 			get_finished(  ) );
 		return;
 	}
 
-	printf( "Executing process %d\n", p->_pid );
+	printf( "Executing process %d\n", p->_process_identity );
 
-	u32 code_trans = virt_to_phys( p->_code_addr, p );
-	u32 data_trans = virt_to_phys( p->_data_addr, p );
+	u32 code_trans = virt_to_phys( p->_code_address, p );
+	u32 data_trans = virt_to_phys( p->_data_address, p );
 
 	u64 timer = p->_time;
 
 	if ( !code_trans )
 	{
 		printf( "fault on code\n" );
-		page_fault( p->_code_addr, p );
+		page_fault( p->_code_address, p );
 		return;
 	}
 
@@ -328,7 +328,7 @@ void process_exec( proc p )
 	if ( !data_trans )
 	{
 		printf( "fault on data\n" );
-		page_fault( p->_data_addr, p );
+		page_fault( p->_data_address, p );
 		return;
 	}
 
@@ -341,10 +341,10 @@ void process_exec( proc p )
 			if ( p->_code_time > timer )
 			{
 				printf( "Process %d ran out of time\n",
-					p->_pid );
+					p->_process_identity );
 
 				p->_code_time -= timer;
-				set_time( time_get(  ) + timer );
+				time_advance( timer );
 				timer -= timer;
 				ready_enq( p );
 				p->_run_counter--;
@@ -353,21 +353,21 @@ void process_exec( proc p )
 
 			else
 			{
-				set_time( time_get(  ) + p->_code_time );
+				time_advance( p->_code_time );
 				timer -= p->_code_time;
 
-				p->_code_addr =
-				    new_code_addr( p->_code_addr,
+				p->_code_address =
+				    new_code_address( p->_code_address,
 						   p->_code_size );
 				p->_code_time = new_code_time(  );
-				code_trans = virt_to_phys( p->_code_addr, p );
+				code_trans = virt_to_phys( p->_code_address, p );
 				p->_run_counter--;
 			}
 
 			if ( !code_trans )
 			{
 				printf( "fault on code\n" );
-				page_fault( p->_code_addr, p );
+				page_fault( p->_code_address, p );
 				return;
 			}
 
@@ -379,10 +379,10 @@ void process_exec( proc p )
 			if ( p->_data_time > timer )
 			{
 				printf( "Process %d ran out of time\n",
-					p->_pid );
+					p->_process_identity );
 
 				p->_data_time -= timer;
-				set_time( time_get(  ) + timer );
+				time_advance( timer );
 				timer -= timer;
 				ready_enq( p );
 				p->_run_counter--;
@@ -391,22 +391,22 @@ void process_exec( proc p )
 
 			else
 			{
-				set_time( time_get(  ) + p->_data_time );
+				time_advance( p->_data_time );
 				timer -= p->_data_time;
 
-				p->_data_addr =
-				    new_data_addr( p->_data_addr, p->_code_size,
+				p->_data_address =
+				    new_data_address( p->_data_address, p->_code_size,
 						   ( p->_code_size +
 						     p->_data_size ) );
 				p->_data_time = new_data_time(  );
-				data_trans = virt_to_phys( p->_data_addr, p );
+				data_trans = virt_to_phys( p->_data_address, p );
 				p->_run_counter--;
 			}
 
 			if ( !data_trans )
 			{
 				printf( "fault on data\n" );
-				page_fault( p->_data_addr, p );
+				page_fault( p->_data_address, p );
 				return;
 			}
 
@@ -441,17 +441,17 @@ int init_process( u8 priority, u32 csize, u32 dsize, u64 t )
 
 	if ( enough_space )
 	{
-		np->_pid = num_proc;
+		np->_process_identity = num_proc;
 		num_proc++;
 
 		np->_priority = priority;
 		np->_time = t;
 
-		np->_code_addr = 0;
+		np->_code_address = 0;
 		np->_code_time = new_code_time(  );
 		np->_code_size = csize;
 
-		np->_data_addr = csize + 1;
+		np->_data_address = csize + 1;
 		np->_data_time = new_data_time(  );
 		np->_data_size = dsize;
 
@@ -483,11 +483,11 @@ int init_process( u8 priority, u32 csize, u32 dsize, u64 t )
 				alloc = page_alloc(  );
 			}
 
-			insert_address( np->_pti, i, alloc );
+			insert_addressess( np->_pti, i, alloc );
 			set_pinned( alloc );
 		}
 
-		printf( "Creating new process, id: %d\n", np->_pid );
+		printf( "Creating new process, id: %d\n", np->_process_identity );
 		ready_enq( np );
 		return 1;
 	} else
@@ -512,7 +512,7 @@ u8 empty_queues(  )
 void scheduler(  )
 {
 	proc gp;
-	set_time( time_get(  ) + 10000 );
+	time_advance( 10000 );
 	blocked_deq(  );
 
 	switch ( counter )

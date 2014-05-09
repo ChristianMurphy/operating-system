@@ -6,7 +6,7 @@ struct {
 	u32 _code_size;
 	u32 _data_size;
 	u32 _priority;
-} proc_init[100] =
+} process_initialize[100] =
 {
 	{
 	( u64 ) 10, 5100000, 20000000, 30000000, 1},
@@ -214,21 +214,21 @@ int main(  )
 {
 	int counter = 0;
 	init_queues(  );
-	set_time( time_get(  ) + 20 );
+	time_advance( 20 );
 	emancipation_proclamation(  );
 
 	do
 	{
 		u8 time_test =
-		    ( time_get(  ) > proc_init[counter]._start_time );
+		    ( time_get(  ) > process_initialize[counter]._start_time );
 		if ( time_test && counter < 100 )
 		{
 
 			int success =
-			    init_process( proc_init[counter]._priority,
-					  proc_init[counter]._code_size,
-					  proc_init[counter]._data_size,
-					  proc_init[counter]._run_time );
+			    init_process( process_initialize[counter]._priority,
+					  process_initialize[counter]._code_size,
+					  process_initialize[counter]._data_size,
+					  process_initialize[counter]._run_time );
 
 			if ( success )
 			{

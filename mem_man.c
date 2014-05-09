@@ -16,7 +16,7 @@ static page mem[PAGE_COUNT];
 static u16 page_avail = 1;
 
 // Status control of memory
-static mem_manage mem_man[PAGE_COUNT] = { 0 };
+static memory_manage_structure memory_manager[PAGE_COUNT] = { 0 };
 
 static u16 mem_offset = 1;
 
@@ -26,52 +26,52 @@ static u64 vas_vec[VAS_VEC_SIZE] = { 0 };
 static u32 vas_offset = 0;
 static u32 vas_count = 4096;
 
-void read_page( u16 y )
+void read_page( u16 page_number )
 {
-	printf( "Reading the contents of page %d\n", y );
+	printf( "Reading the contents of page %d\n", page_number );
 }
 
-void write_page( u16 y )
+void write_page( u16 page_number )
 {
-	printf( "Writing into page %d\n", y );
+	printf( "Writing into page %d\n", page_number );
 }
 
-page get_page( u32 addr )
+page get_page( u32 address )
 {
-	return mem[addr];
+	return mem[address];
 }
 
-void set_used( u16 y )
+void set_used( u16 page_number )
 {
-	mem_man[y]._used = 1;
+	memory_manager[page_number]._used = 1;
 }
 
-void set_pinned( u16 y )
+void set_pinned( u16 page_number )
 {
-	mem_man[y]._pinned = 1;
+	memory_manager[page_number]._pinned = 1;
 }
 
-void clear_pinned( u16 y )
+void clear_pinned( u16 page_number )
 {
-	mem_man[y]._pinned = 0;
+	memory_manager[page_number]._pinned = 0;
 }
 
-void insert_address( u16 y, int index, u16 addr )
+void insert_addressess( u16 page_number, int index, u16 address )
 {
-	mem[y]._u32[index] = addr;
-	printf( "Placing address %d in index %d of page %d\n", addr, index, y );
+	mem[page_number]._u32[index] = address;
+	printf( "Placing addressess %d in index %d of page %d\n", address, index, page_number );
 }
 
-u16 get_address( u16 y, int index )
+u16 get_addressess( u16 page_number, int index )
 {
-	u32 a = mem[y]._u32[index];
+	u32 a = mem[page_number]._u32[index];
 	u16 b = a & 0xFFFF;
 	return b;
 }
 
 // Creates page at page_avail, if page_avail is not 0.
 // Page_avail is set to the allocated pages _u16.
-// Return the address of the newly allocated page.
+// Return the addressess of the newly allocated page.
 u16 page_alloc(  )
 {
 	u16 t = page_avail;
@@ -89,10 +89,10 @@ u16 page_alloc(  )
 
 // Frees page x.
 // Page x's _u16 is set to the current page_avail.
-// page_avail is then set to the address of the new page.
+// page_avail is then set to the addressess of the new page.
 void page_free( u16 x )
 {
-	if ( mem_man[x]._dirty )
+	if ( memory_manager[x]._dirty )
 	{
 		printf( "Page %d is dirty and will be written to disk\n", x );
 	}
@@ -111,34 +111,34 @@ void emancipation_proclamation(  )
 }
 
 //
-u32 virt_to_phys( u32 addr, proc p )
+u32 virt_to_phys( u32 address, proc p )
 {
-	u32 l1_index = addr >> 22;
-	u32 l2_index = ( ( addr >> 12 ) & 0x3FF );
+	u32 l1_index = address >> 22;
+	u32 l2_index = ( ( address >> 12 ) & 0x3FF );
 
-	u16 l1_addr = p->_pti;
-	page l1 = mem[l1_addr];
-	u32 l2_addr = l1._u32[l1_index];
+	u16 l1_address = p->_pti;
+	page l1 = mem[l1_address];
+	u32 l2_address = l1._u32[l1_index];
 
-	if ( !l2_addr )
+	if ( !l2_address )
 	{
 		return 0;
 	}
 
-	page l2 = mem[l2_addr];
-	u32 phys_addr = l2._u32[l2_index];
+	page l2 = mem[l2_address];
+	u32 phys_address = l2._u32[l2_index];
 
-	if ( !phys_addr )
+	if ( !phys_address )
 	{
 		return 0;
 	}
-	return phys_addr;
+	return phys_address;
 }
 
 //
-void page_fault( u32 addr, proc p )
+void page_fault( u32 address, proc p )
 {
-	printf( "Process %d faulted on address %d\n", p->_pid, addr );
+	printf( "Process %d faulted on addressess %d\n", p->_process_identity, address );
 
 	u16 alloc = page_alloc(  );
 
@@ -152,14 +152,14 @@ void page_fault( u32 addr, proc p )
 	}
 	printf( "Page %d found\n", alloc );
 
-	u32 l1_index = addr >> 22;
-	u32 l2_index = ( ( addr >> 12 ) & 0x3FF );
-	u16 l1_addr = p->_pti;
-	page l1 = mem[l1_addr];
-	u32 l2_addr = l1._u32[l1_index];
+	u32 l1_index = address >> 22;
+	u32 l2_index = ( ( address >> 12 ) & 0x3FF );
+	u16 l1_address = p->_pti;
+	page l1 = mem[l1_address];
+	u32 l2_address = l1._u32[l1_index];
 
-	u64 d_time = disk_read( addr, alloc );
-	insert_address( l2_addr, l2_index, alloc );
+	u64 d_time = disk_read( address, alloc );
+	insert_addressess( l2_address, l2_index, alloc );
 	blocked_enq( p, d_time );
 }
 
@@ -184,10 +184,10 @@ int vas_alloc( u16 v[], u32 size )
 
 			// Find a free chunk and record its position
 			u16 bit_pos = ( u16 ) lsb64( vas_vec[vas_offset] );
-			// Create an address of the chunk level index and position
-			u16 chunk_address = ( vas_offset << 8 ) | ( bit_pos );
-			// Store address in the passed in array
-			v[i] = chunk_address;
+			// Create an addressess of the chunk level index and position
+			u16 chunk_addressess = ( vas_offset << 8 ) | ( bit_pos );
+			// Store addressess in the passed in array
+			v[i] = chunk_addressess;
 
 			u64 flipped_bit = 1;
 			flipped_bit = flipped_bit << bit_pos;
@@ -212,10 +212,10 @@ void vas_free( u16 v[], u32 size )
 	int i;
 	for ( i = 0; i < size; i++ )
 	{
-		// Get an address of a chunk to be free
-		u16 chunk_address = v[i];
-		u16 bit_pos = chunk_address & 0x00FF;
-		u16 vas_offset_temp = chunk_address >> 8;
+		// Get an addressess of a chunk to be free
+		u16 chunk_addressess = v[i];
+		u16 bit_pos = chunk_addressess & 0x00FF;
+		u16 vas_offset_temp = chunk_addressess >> 8;
 
 		u64 flipped_bit = 1;
 		flipped_bit = flipped_bit << bit_pos;
@@ -234,12 +234,12 @@ u16 walk_page_ring(  )
 	int i;
 	for ( i = 0; i < PAGE_COUNT; i++ )
 	{
-		if ( !( mem_man[i]._used ) && !( mem_man[i]._pinned ) )
+		if ( !( memory_manager[i]._used ) && !( memory_manager[i]._pinned ) )
 		{
 			temp = i;
 			break;
 		}
-		mem_man[i]._used = 0;
+		memory_manager[i]._used = 0;
 	}
 	return temp;
 }
