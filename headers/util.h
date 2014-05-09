@@ -1,4 +1,4 @@
-# pragma once
+#pragma once
 
 u32 least_significant_bit8( u8 x );
 u32 least_significant_bit16( u16 x );

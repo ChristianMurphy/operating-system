@@ -1,6 +1,6 @@
-# pragma once
+#pragma once
 
-#    define	CASE	break; case
+#define	CASE	break; case
 
 typedef char s8;
 typedef unsigned char u8;
@@ -30,9 +30,9 @@ typedef union {
 
 typedef enum {
 	Code,
-    Data,
-    File,
-    Network,
-    Keyboard,
-    Timer
+	Data,
+	File,
+	Network,
+	Keyboard,
+	Timer
 } dev_type;

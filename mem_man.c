@@ -9,19 +9,16 @@
 #define	virtual_address_space_vector_SIZE (1 << 6)
 #define	virtual_address_space_vector_SIZE_MASK (virtual_address_space_vector_SIZE - 1)
 
-
 static page page_memory[PAGE_COUNT];
 
-
 static u16 page_availible = 1;
-
 
 static memory_manage_structure memory_manager[PAGE_COUNT] = { 0 };
 
 static u16 memory_offset = 1;
 
-
-static u64 virtual_address_space_vector[virtual_address_space_vector_SIZE] = { 0 };
+static u64 virtual_address_space_vector[virtual_address_space_vector_SIZE] =
+    { 0 };
 
 static u32 virtual_address_space_offset = 0;
 static u32 virtual_address_space_count = 4096;
@@ -59,7 +56,8 @@ void unset_pinned_bit( u16 page_number )
 void address_set( u16 page_number, int index, u16 address )
 {
 	page_memory[page_number]._u32[index] = address;
-	printf( "Page %d index %d is storing address\n", page_number, index, address );
+	printf( "Page %d index %d is storing address\n", page_number, index,
+		address );
 }
 
 u16 address_get( u16 page_number, int index )
@@ -68,9 +66,6 @@ u16 address_get( u16 page_number, int index )
 	u16 b = a & 0xFFFF;
 	return b;
 }
-
-
-
 
 u16 page_allocation(  )
 {
@@ -87,15 +82,12 @@ u16 page_allocation(  )
 	return t;
 }
 
-
-
-
 void page_free( u16 page_index )
 {
 	if ( memory_manager[page_index]._dirty )
 	{
 		printf( "Page %d is dirty\n", page_index );
-        write_page(page_index);
+		write_page( page_index );
 	}
 
 	page_memory[page_index]._u16[0] = page_availible;
@@ -110,7 +102,6 @@ void page_free_all(  )
 		page_memory[index]._u16[0] = index + 1;
 	}
 }
-
 
 u32 virtual_to_physical( u32 address, proc current_process )
 {
@@ -136,10 +127,10 @@ u32 virtual_to_physical( u32 address, proc current_process )
 	return physical_address;
 }
 
-
 void page_fault( u32 address, proc current_process )
 {
-	printf( "Process %d faulted on addressess %d\n", current_process->_process_identity, address );
+	printf( "Process %d faulted on addressess %d\n",
+		current_process->_process_identity, address );
 
 	u16 allocation = page_allocation(  );
 
@@ -164,7 +155,6 @@ void page_fault( u32 address, proc current_process )
 	blocked_enqueue( current_process, d_time );
 }
 
-
 int virtual_address_space_allocation( u16 virtual_space[], u32 size )
 {
 	int result = 0;
@@ -174,7 +164,9 @@ int virtual_address_space_allocation( u16 virtual_space[], u32 size )
 		int index;
 		for ( index = 0; index < size; index++ )
 		{
-			while ( virtual_address_space_vector[virtual_address_space_offset] == 0xFFFFFFFFFFFFFFFF )
+			while ( virtual_address_space_vector
+				[virtual_address_space_offset] ==
+				0xFFFFFFFFFFFFFFFF )
 			{
 				virtual_address_space_offset++;
 				if ( virtual_address_space_offset > 63 )
@@ -183,51 +175,56 @@ int virtual_address_space_allocation( u16 virtual_space[], u32 size )
 				}
 			}
 
-			
-			u16 bit_position = ( u16 ) least_significant_bit64( virtual_address_space_vector[virtual_address_space_offset] );
-			
-			u16 chunk_addressess = ( virtual_address_space_offset << 8 ) | ( bit_position );
-			
+			u16 bit_position =
+			    ( u16 )
+			    least_significant_bit64
+			    ( virtual_address_space_vector
+			      [virtual_address_space_offset] );
+
+			u16 chunk_addressess =
+			    ( virtual_address_space_offset << 8 ) |
+			    ( bit_position );
+
 			virtual_space[index] = chunk_addressess;
 
 			u64 flipped_bit = 1;
 			flipped_bit = flipped_bit << bit_position;
 
-			
-			virtual_address_space_vector[virtual_address_space_offset] =
-			    virtual_address_space_vector[virtual_address_space_offset] | ( flipped_bit );
+			virtual_address_space_vector
+			    [virtual_address_space_offset] =
+			    virtual_address_space_vector
+			    [virtual_address_space_offset] | ( flipped_bit );
 
-			
 			virtual_address_space_count--;
 		}
 
 		result = 1;
 	}
-	
+
 	return result;
 }
-
 
 void vas_free( u16 virtual_space[], u32 size )
 {
 	int index;
 	for ( index = 0; index < size; index++ )
 	{
-		
+
 		u16 chunk_addressess = virtual_space[index];
 		u16 bit_position = chunk_addressess & 0x00FF;
-		u16 virtual_address_space_offset_temparary = chunk_addressess >> 8;
+		u16 virtual_address_space_offset_temparary =
+		    chunk_addressess >> 8;
 
 		u64 flipped_bit = 1;
 		flipped_bit = flipped_bit << bit_position;
-		virtual_address_space_vector[virtual_address_space_offset_temparary] =
-		    virtual_address_space_vector[virtual_address_space_offset_temparary] & ~( flipped_bit );
+		virtual_address_space_vector
+		    [virtual_address_space_offset_temparary] =
+		    virtual_address_space_vector
+		    [virtual_address_space_offset_temparary] & ~( flipped_bit );
 
 		virtual_address_space_count++;
 	}
 }
-
-
 
 u16 walk_page_ring(  )
 {
@@ -235,7 +232,8 @@ u16 walk_page_ring(  )
 	int index;
 	for ( index = 0; index < PAGE_COUNT; index++ )
 	{
-		if ( !( memory_manager[index]._used ) && !( memory_manager[index]._pinned ) )
+		if ( !( memory_manager[index]._used )
+		     && !( memory_manager[index]._pinned ) )
 		{
 			temparary = index;
 			break;

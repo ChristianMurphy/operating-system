@@ -1,7 +1,7 @@
-# pragma once
+#pragma once
 
-#    include "types.h"
-#    include "proc.h"
+#include "types.h"
+#include "proc.h"
 
 typedef struct {
 	u64 _used:1;

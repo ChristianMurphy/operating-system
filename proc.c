@@ -17,8 +17,6 @@ static u64 time_blocked = 0;
 static u16 number_of_processes = 1;
 static u16 completed_processes = 0;
 
-
-
 void blocked_enqueue( proc current_process, u64 estimated_time )
 {
 	printf( "process %d is blocked\n", current_process->_process_identity );
@@ -41,12 +39,12 @@ void blocked_dequeue(  )
 		return;
 	}
 
-	proc cp = _blocked._head;
-	proc pp = _blocked._head;
+	proc current_process = _blocked._head;
+	proc previous_process = _blocked._head;
 
 	if ( _blocked._head != NULL && _blocked._head->_next == NULL )
 	{
-		if ( cp->_blocked_timer <= time_get(  ) )
+		if ( current_process->_blocked_timer <= time_get(  ) )
 		{
 			printf( "process %d unblocked\n",
 				_blocked._head->_process_identity );
@@ -60,43 +58,50 @@ void blocked_dequeue(  )
 	{
 		do
 		{
-			if ( cp->_blocked_timer <= time_get(  ) )
+			if ( current_process->_blocked_timer <= time_get(  ) )
 			{
-				if ( _blocked._head == cp )
+				if ( _blocked._head == current_process )
 				{
-					_blocked._head = cp->_next;
-					cp->_next = NULL;
+					_blocked._head = current_process->_next;
+					current_process->_next = NULL;
 					printf
 					    ( "process %d unblocked\n",
-					      cp->_process_identity );
-					ready_enqueue( cp );
-					cp = _blocked._head;
-					pp = cp;
+					      current_process->
+					      _process_identity );
+					ready_enqueue( current_process );
+					current_process = _blocked._head;
+					previous_process = current_process;
 				} else
 				{
-					pp->_next = cp->_next;
-					cp->_next = NULL;
+					previous_process->_next =
+					    current_process->_next;
+					current_process->_next = NULL;
 					printf
 					    ( "process %d unblocked\n",
-					      cp->_process_identity );
-					ready_enqueue( cp );
-					cp = pp->_next;
+					      current_process->
+					      _process_identity );
+					ready_enqueue( current_process );
+					current_process =
+					    previous_process->_next;
 				}
 			}
 
 			else
 			{
-				if ( cp == pp )
+				if ( current_process == previous_process )
 				{
-					cp = cp->_next;
+					current_process =
+					    current_process->_next;
 				} else
 				{
-					cp = cp->_next;
-					pp = pp->_next;
+					current_process =
+					    current_process->_next;
+					previous_process =
+					    previous_process->_next;
 				}
 			}
 		}
-		while ( cp != NULL );
+		while ( current_process != NULL );
 	}
 }
 
@@ -136,7 +141,7 @@ void ready_enqueue( proc current_process )
 				_medium._tail = current_process;
 			}
 			printf
-			    ( "process %d is ready [medium priotiy]\n",
+			    ( "process %d is ready [medium priority]\n",
 			      current_process->_process_identity );
 		}
 
@@ -164,10 +169,8 @@ proc ready_dequeue( u8 priority )
 {
 	proc current_process;
 
-	switch ( priority )
+	if ( priority == 1 )
 	{
-	case 1:
-
 		if ( _high._head == NULL )
 		{
 			return NULL;
@@ -182,12 +185,10 @@ proc ready_dequeue( u8 priority )
 			_high._head = current_process->_next;
 			current_process->_next = NULL;
 		}
-		printf( "Removing process %d from the high priority queue\n",
+		printf( "process %d dequeued from ready [high priority]\n",
 			current_process->_process_identity );
-		break;
-
-	case 2:
-
+	} else if ( priority == 2 )
+	{
 		if ( _medium._head == NULL )
 		{
 			return NULL;
@@ -205,11 +206,12 @@ proc ready_dequeue( u8 priority )
 			current_process->_next = NULL;
 		}
 
-		printf( "Removing process %d from the medium priority queue\n",
+		printf( "process %d dequeued from ready [medium priority]\n",
 			current_process->_process_identity );
-		break;
+	}
 
-	case 3:
+	else if ( priority == 3 )
+	{
 
 		if ( _low._head == NULL )
 		{
@@ -225,13 +227,11 @@ proc ready_dequeue( u8 priority )
 			_low._head = current_process->_next;
 			current_process->_next = NULL;
 		}
-		printf( "Removing process %d from the low priority queue\n",
+		printf( "process %d dequeued from ready [medium priority]\n",
 			current_process->_process_identity );
-		break;
 	}
 	return current_process;
 }
-
 
 u32 new_code_address( u32 address, u32 limit )
 {
@@ -244,12 +244,10 @@ u32 new_code_address( u32 address, u32 limit )
 	return ( address > limit ) ? address = r % limit : address;
 }
 
-
 u64 new_code_time(  )
 {
 	return 50 + ( rand(  ) & 0xfff );
 }
-
 
 u32 new_data_address( u32 address, u32 base, u32 limit )
 {
@@ -264,12 +262,10 @@ u32 new_data_address( u32 address, u32 base, u32 limit )
 	    base + ( r % ( limit - base ) ) : address;
 }
 
-
 u64 new_data_time(  )
 {
 	return 100 + ( rand(  ) & 0x1fff );
 }
-
 
 u64 time_get(  )
 {
@@ -286,7 +282,6 @@ u16 get_finished(  )
 	return completed_processes;
 }
 
-
 void process_execute( proc current_process )
 {
 
@@ -297,11 +292,13 @@ void process_execute( proc current_process )
 		int index;
 		for ( index = 0; index < current_process->_vas; index++ )
 		{
-			u16 level_two = address_get( current_process->_pti, index );
+			u16 level_two =
+			    address_get( current_process->_pti, index );
 			unset_pinned_bit( level_two );
 		}
 		unset_pinned_bit( current_process->_pti );
-		printf( "process %d has completed\n", current_process->_process_identity );
+		printf( "process %d has completed\n",
+			current_process->_process_identity );
 		completed_processes++;
 		printf( "%d total processes have completed\n",
 			get_finished(  ) );
@@ -310,14 +307,18 @@ void process_execute( proc current_process )
 
 	printf( "process %d executing\n", current_process->_process_identity );
 
-	u32 code_translation = virtual_to_physical( current_process->_code_address, current_process );
-	u32 data_translation = virtual_to_physical( current_process->_data_address, current_process );
+	u32 code_translation =
+	    virtual_to_physical( current_process->_code_address,
+				 current_process );
+	u32 data_translation =
+	    virtual_to_physical( current_process->_data_address,
+				 current_process );
 
 	u64 timer = current_process->_time;
 
 	if ( !code_translation )
 	{
-        printf( "page fault for code page\n" );
+		printf( "page fault for code page\n" );
 		page_fault( current_process->_code_address, current_process );
 		return;
 	}
@@ -356,17 +357,23 @@ void process_execute( proc current_process )
 				timer -= current_process->_code_time;
 
 				current_process->_code_address =
-				    new_code_address( current_process->_code_address,
-						   current_process->_code_size );
+				    new_code_address( current_process->
+						      _code_address,
+						      current_process->
+						      _code_size );
 				current_process->_code_time = new_code_time(  );
-				code_translation = virtual_to_physical( current_process->_code_address, current_process );
+				code_translation =
+				    virtual_to_physical( current_process->
+							 _code_address,
+							 current_process );
 				current_process->_run_counter--;
 			}
 
 			if ( !code_translation )
 			{
 				printf( "fault on code\n" );
-				page_fault( current_process->_code_address, current_process );
+				page_fault( current_process->_code_address,
+					    current_process );
 				return;
 			}
 
@@ -394,18 +401,27 @@ void process_execute( proc current_process )
 				timer -= current_process->_data_time;
 
 				current_process->_data_address =
-				    new_data_address( current_process->_data_address, current_process->_code_size,
-						   ( current_process->_code_size +
-						     current_process->_data_size ) );
+				    new_data_address( current_process->
+						      _data_address,
+						      current_process->
+						      _code_size,
+						      ( current_process->
+							_code_size +
+							current_process->
+							_data_size ) );
 				current_process->_data_time = new_data_time(  );
-				data_translation = virtual_to_physical( current_process->_data_address, current_process );
+				data_translation =
+				    virtual_to_physical( current_process->
+							 _data_address,
+							 current_process );
 				current_process->_run_counter--;
 			}
 
 			if ( !code_translation )
 			{
 				printf( "page fault for code page\n" );
-				page_fault( current_process->_data_address, current_process );
+				page_fault( current_process->_data_address,
+					    current_process );
 				return;
 			}
 
@@ -414,21 +430,19 @@ void process_execute( proc current_process )
 	}
 }
 
-
 void initialize_queues(  )
 {
 	_blocked._head = NULL;
 
-	_high._head = NULL;
-	_high._tail = NULL;
+	_low._head = NULL;
+	_low._tail = NULL;
 
 	_medium._head = NULL;
 	_medium._tail = NULL;
 
-	_low._head = NULL;
-	_low._tail = NULL;
+	_high._head = NULL;
+	_high._tail = NULL;
 }
-
 
 int initialize_process( u8 priority, u32 csize, u32 dsize, u64 t )
 {
@@ -436,7 +450,8 @@ int initialize_process( u8 priority, u32 csize, u32 dsize, u64 t )
 
 	np->_vas = ( ( ( ( csize + dsize ) / 1000 ) / 1000 ) / 4 );
 
-	int enough_space = virtual_address_space_allocation( np->_sbt, np->_vas );
+	int enough_space =
+	    virtual_address_space_allocation( np->_sbt, np->_vas );
 
 	if ( enough_space )
 	{
@@ -486,7 +501,8 @@ int initialize_process( u8 priority, u32 csize, u32 dsize, u64 t )
 			set_pinned_bit( allocation );
 		}
 
-		printf( "Creating new process, id: %d\n", np->_process_identity );
+		printf( "Creating new process, id: %d\n",
+			np->_process_identity );
 		ready_enqueue( np );
 		return 1;
 	} else
@@ -506,26 +522,22 @@ u8 empty_queues(  )
 	return x;
 }
 
-
-
 void scheduler(  )
 {
 	proc global_process;
 	time_advance( 10000 );
 	blocked_dequeue(  );
 
-    if (counter < 4)
-    {
-        global_process = ready_dequeue( 1 );
-    }
-    else if (counter < 7)
-    {
-        global_process = ready_dequeue( 2 );
-    }
-    else
-    {
-        global_process = ready_dequeue( 3 );
-    }
+	if ( counter < 4 )
+	{
+		global_process = ready_dequeue( 1 );
+	} else if ( counter < 7 )
+	{
+		global_process = ready_dequeue( 2 );
+	} else
+	{
+		global_process = ready_dequeue( 3 );
+	}
 
 	if ( global_process != NULL )
 	{

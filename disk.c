@@ -14,7 +14,6 @@ static u32 read_latency = 8 << 20;
 static u32 write_latency = 8 << 20;
 static u64 disk_time = 0;
 
-
 int swap_allocation( u16 virtual_space[], u32 size )
 {
 	u32 index;
@@ -39,16 +38,15 @@ int swap_allocation( u16 virtual_space[], u32 size )
 	return 1;
 }
 
-
 void swap_free( u16 virtual_space[], u32 size )
 {
 	u32 index;
 
 	for ( index = 0; index < size; ++index )
-		avail[virtual_space[index] >> 6] &= ~( 1ul << ( virtual_space[index] & 63 ) );
+		avail[virtual_space[index] >> 6] &=
+		    ~( 1ul << ( virtual_space[index] & 63 ) );
 	count += size;
 }
-
 
 u64 disk_read( u32 block, u16 address )
 {
@@ -73,13 +71,12 @@ u64 disk_read( u32 block, u16 address )
 
 	if ( block < SWAP_SIZE )
 	{
-		
+
 		write_page( address );
 	}
 
 	return disk_time;
 }
-
 
 u64 disk_write( u32 block, u16 address )
 {
