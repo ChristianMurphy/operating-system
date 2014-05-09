@@ -122,22 +122,3 @@ u32 least_significant_bit64( u64 number )
 
 	return position;
 }
-
-#ifdef	_UTL_TEST_
-
-int main(  )
-{
-	int index;
-	int number;
-	int page_number;
-	int z;
-
-	for ( index = 0; index < 256; ++index )
-	{
-		number = least_significant_bit8( index );
-		printf( "least_significant_bit8(index) = %02x\n", number );
-	}
-
-}
-
-#endif

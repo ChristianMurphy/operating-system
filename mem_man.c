@@ -96,8 +96,7 @@ void page_free( u16 page_index )
 
 void page_free_all(  )
 {
-	u16 index;
-	for ( index = 1; index < PAGE_COUNT - 1; index++ )
+	for ( u16 index = 1; index < PAGE_COUNT - 1; index++ )
 	{
 		page_memory[index]._u16[0] = index + 1;
 	}
@@ -161,8 +160,7 @@ int virtual_address_space_allocation( u16 virtual_space[], u32 size )
 
 	if ( size <= virtual_address_space_count )
 	{
-		int index;
-		for ( index = 0; index < size; index++ )
+		for ( int index = 0; index < size; index++ )
 		{
 			while ( virtual_address_space_vector
 				[virtual_address_space_offset] ==
@@ -206,8 +204,7 @@ int virtual_address_space_allocation( u16 virtual_space[], u32 size )
 
 void vas_free( u16 virtual_space[], u32 size )
 {
-	int index;
-	for ( index = 0; index < size; index++ )
+	for ( int index = 0; index < size; index++ )
 	{
 
 		u16 chunk_addressess = virtual_space[index];
@@ -229,8 +226,7 @@ void vas_free( u16 virtual_space[], u32 size )
 u16 walk_page_ring(  )
 {
 	u16 temparary = 0;
-	int index;
-	for ( index = 0; index < PAGE_COUNT; index++ )
+	for ( int index = 0; index < PAGE_COUNT; index++ )
 	{
 		if ( !( memory_manager[index]._used )
 		     && !( memory_manager[index]._pinned ) )

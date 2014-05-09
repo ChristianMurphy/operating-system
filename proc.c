@@ -116,7 +116,6 @@ void ready_enqueue( proc current_process )
 				_high._head = current_process;
 				_high._tail = current_process;
 			}
-
 			else
 			{
 				_high._tail->_next = current_process;
@@ -174,12 +173,14 @@ proc ready_dequeue( u8 priority )
 		if ( _high._head == NULL )
 		{
 			return NULL;
-		} else if ( _high._head == _high._tail && _high._head != NULL )
+		}
+        else if ( _high._head == _high._tail && _high._head != NULL )
 		{
 			current_process = _high._head;
 			_high._head = NULL;
 			_high._tail = NULL;
-		} else
+		}
+        else
 		{
 			current_process = _high._head;
 			_high._head = current_process->_next;
@@ -187,18 +188,21 @@ proc ready_dequeue( u8 priority )
 		}
 		printf( "process %d dequeued from ready [high priority]\n",
 			current_process->_process_identity );
-	} else if ( priority == 2 )
+	}
+    else if ( priority == 2 )
 	{
 		if ( _medium._head == NULL )
 		{
 			return NULL;
-		} else if ( _medium._head == _medium._tail
+		}
+        else if ( _medium._head == _medium._tail
 			    && _medium._head != NULL )
 		{
 			current_process = _medium._head;
 			_medium._head = NULL;
 			_medium._tail = NULL;
-		} else
+		}
+        else
 		{
 
 			current_process = _medium._head;
@@ -216,12 +220,14 @@ proc ready_dequeue( u8 priority )
 		if ( _low._head == NULL )
 		{
 			return NULL;
-		} else if ( _low._head == _low._tail && _low._head != NULL )
+		}
+        else if ( _low._head == _low._tail && _low._head != NULL )
 		{
 			current_process = _low._head;
 			_low._head = NULL;
 			_low._tail = NULL;
-		} else
+		}
+        else
 		{
 			current_process = _low._head;
 			_low._head = current_process->_next;
@@ -289,8 +295,7 @@ void process_execute( proc current_process )
 	{
 		vas_free( current_process->_sbt, current_process->_virtual_address_space );
 
-		int index;
-		for ( index = 0; index < current_process->_virtual_address_space; index++ )
+		for ( int index = 0; index < current_process->_virtual_address_space; index++ )
 		{
 			u16 level_two =
 			    address_get( current_process->_page_table_index, index );
@@ -394,7 +399,6 @@ void process_execute( proc current_process )
 				current_process->_run_counter--;
 				return;
 			}
-
 			else
 			{
 				time_advance( current_process->_data_time );
@@ -485,18 +489,15 @@ int initialize_process( u8 priority, u32 code_size, u32 data_size, u64 t )
 		new_process->_page_table_index = allocation;
 		set_pinned_bit( allocation );
 
-		int index;
-		for ( index = 0; index < new_process->_virtual_address_space; index++ )
+		for ( int index = 0; index < new_process->_virtual_address_space; index++ )
 		{
 			u16 allocation = page_allocation(  );
-
 			if ( !allocation )
 			{
 				u16 swap_page = walk_page_ring(  );
 				page_free( swap_page );
 				allocation = page_allocation(  );
 			}
-
 			address_set( new_process->_page_table_index, index, allocation );
 			set_pinned_bit( allocation );
 		}
@@ -505,14 +506,15 @@ int initialize_process( u8 priority, u32 code_size, u32 data_size, u64 t )
 			new_process->_process_identity );
 		ready_enqueue( new_process );
 		return 1;
-	} else
+	}
+    else
 	{
 		free( new_process );
 		return 0;
 	}
 }
 
-u8 empty_queues(  )
+u8 remaining_processes(  )
 {
 	u8 blocked_empty = ( _blocked._head == NULL );
 	u8 high_empty = ( _high._head == NULL );

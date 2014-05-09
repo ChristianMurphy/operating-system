@@ -16,23 +16,24 @@ static u64 disk_time = 0;
 
 int swap_allocation( u16 virtual_space[], u32 size )
 {
-	u32 index;
-	u32 t;
-
 	if ( count < size )
 	{
 		return 0;
 	}
 
-	for ( index = 0; index < size; ++index )
+    u32 t;
+	for ( u32 index = 0; index < size; ++index )
 	{
 		if ( ~( avail[offset] ) )
 		{
 			t = least_significant_bit64( avail[offset] );
 			avail[offset] |= 1ul << t;
 			virtual_space[index] = ( offset << 6 ) | t;
-		} else
+		}
+        else
+        {
 			offset = ( offset + 1 ) & SWAP_SIZE_MASK;
+        }
 	}
 	count -= size;
 	return 1;
@@ -40,11 +41,11 @@ int swap_allocation( u16 virtual_space[], u32 size )
 
 void swap_free( u16 virtual_space[], u32 size )
 {
-	u32 index;
-
-	for ( index = 0; index < size; ++index )
+	for ( u32 index = 0; index < size; ++index )
+    {
 		avail[virtual_space[index] >> 6] &=
 		    ~( 1ul << ( virtual_space[index] & 63 ) );
+    }
 	count += size;
 }
 
@@ -83,13 +84,14 @@ u64 disk_write( u32 block, u16 address )
 	u32 delta = rand(  );
 
 	if ( time_get(  ) > disk_time )
+    {
 		disk_time = time_get(  );
+    }
 
 	if ( delta & 1 )
 	{
 		disk_time += write_latency + ( delta & 0x3FFFFF );
 	}
-
 	else
 	{
 		disk_time += write_latency - ( delta & 0x1FFFFF );

@@ -241,6 +241,6 @@ int main(  )
 		}
 		scheduler(  );
 	}
-	while ( ( counter < 100 ) || ( empty_queues(  ) == 0 ) );
+	while ( ( counter < 100 ) || ( remaining_processes(  ) == 0 ) );
 	printf( "program complete\n" );
 }

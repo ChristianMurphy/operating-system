@@ -50,7 +50,7 @@ u16 get_finished(  );
 
 void initialize_queues(  );
 int initialize_process( u8 current_process, u32 code_size, u32 data_size, u64 t );
-u8 empty_queues(  );
+u8 remaining_processes(  );
 
 u32 new_code_address( u32 address, u32 limit );
 u64 new_code_time(  );
