@@ -225,14 +225,14 @@ int main(  )
 		{
 
 			int success =
-			    initialize_process( process_initialize[counter].
-						_priority,
-						process_initialize[counter].
-						_code_size,
-						process_initialize[counter].
-						_data_size,
-						process_initialize[counter].
-						_run_time );
+			    initialize_process( process_initialize
+						[counter]._priority,
+						process_initialize
+						[counter]._code_size,
+						process_initialize
+						[counter]._data_size,
+						process_initialize
+						[counter]._run_time );
 
 			if ( success )
 			{
