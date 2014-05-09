@@ -15,17 +15,17 @@ typedef long s64;
 typedef unsigned long u64;
 
 typedef union {
-    u8 _u8[4096];
-    s8 _s8[4096];
+	u8 _u8[4096];
+	s8 _s8[4096];
 
-    u16 _u16[2048];
-    s16 _s16[2048];
+	u16 _u16[2048];
+	s16 _s16[2048];
 
-    u32 _u32[1024];
-    s32 _s32[1024];
+	u32 _u32[1024];
+	s32 _s32[1024];
 
-    u64 _u64[512];
-    s64 _s64[512];
+	u64 _u64[512];
+	s64 _s64[512];
 } page;
 
 u64 disk_read( u32 block, u16 address );
@@ -86,7 +86,6 @@ u32 new_code_address( u32 address, u32 limit );
 u64 new_code_time(  );
 u32 new_data_address( u32 address, u32 base, u32 limit );
 u64 new_data_time(  );
-
 
 u64 disk_read( u32 block, u16 address );
 u64 disk_write( u32 block, u16 address );
